@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('received_goods', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('po_id')->constrained('pos')->onDelete('cascade'); // Relasi ke PO
+            $table->foreignId('spb_id')->nullable()->constrained('spbs')->onDelete('cascade'); // Relasi ke SPB (opsional)
             $table->foreignId('inventory_id')->constrained('inventories')->onDelete('cascade'); // Barang yang diterima
             $table->integer('quantity_received'); // Jumlah barang yang diterima
             $table->date('received_date'); // Tanggal penerimaan

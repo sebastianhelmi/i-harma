@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); // Ditugaskan ke siapa
             $table->date('due_date')->nullable(); // Deadline tugas
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending'); // Status tugas
+            $table->foreignId('parent_task_id')->nullable()->constrained('tasks')->onDelete('cascade'); // Relasi ke tugas utama (subtask)
             $table->timestamps();
         });
     }

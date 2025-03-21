@@ -17,6 +17,7 @@ class SPB extends Model
         'item_category_id',
         'category_item',
         'status',
+        'status_po',
         'remarks',
         'approved_at',
         'approved_by',
@@ -49,7 +50,7 @@ class SPB extends Model
 
     public function deliveries()
     {
-        return $this->hasMany(Delivery::class);
+        return $this->hasMany(DeliveryPlan::class);
     }
 
     public function workshopDetails()

@@ -1,0 +1,347 @@
+// Variables
+$sidebar-width: 250px;
+$sidebar-collapsed-width: 70px;
+$primary-color: #1E3A8A;
+$accent-color: #FACC15;
+$active-menu-color: #1E40AF;
+$text-muted: #6B7280;
+$border-color: #E5E7EB;
+$bg-light: #F3F4F6;
+
+// Base Layout
+.wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+// Sidebar
+.sidebar {
+    width: $sidebar-width;
+    background: $primary-color;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: fixed;
+    z-index: 1000;
+
+    &.collapsed {
+        width: $sidebar-collapsed-width;
+
+        .company-name,
+        .components span {
+            display: none;
+        }
+    }
+
+    .sidebar-header {
+        padding: 1.5rem 1rem;
+        background: darken($primary-color, 5%);
+
+        .logo {
+            height: 40px;
+            margin-right: 1rem;
+        }
+
+        .company-name {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+    }
+
+    .components {
+        padding: 1rem 0;
+
+        li {
+            a {
+                padding: 0.75rem 1.5rem;
+                display: flex;
+                align-items: center;
+                color: rgba(255, 255, 255, 0.8);
+                text-decoration: none;
+                transition: all 0.3s;
+
+                i {
+                    width: 20px;
+                    margin-right: 0.75rem;
+                    font-size: 1.1rem;
+                }
+
+                &:hover {
+                    color: white;
+                    background: rgba(255, 255, 255, 0.1);
+                }
+            }
+
+            &.active a {
+                background: $active-menu-color;
+                color: white;
+                border-left: 4px solid $accent-color;
+            }
+        }
+    }
+
+    .reports-link {
+        position: relative;
+
+        &::after {
+            content: 'New';
+            position: absolute;
+            top: 50%;
+            right: 1rem;
+            transform: translateY(-50%);
+            background: $accent-color;
+            color: $primary-color;
+            padding: 0.1rem 0.5rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+    }
+}
+
+// Content Area
+.content {
+    flex: 1;
+    margin-left: $sidebar-width;
+    transition: all 0.3s;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+
+    &.expanded {
+        margin-left: $sidebar-collapsed-width;
+    }
+}
+
+// Navbar
+.navbar {
+    padding: 1rem 1.5rem;
+    background: white;
+
+    .navbar-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: $primary-color;
+    }
+
+    .notifications {
+        .badge {
+            background: #EF4444;
+        }
+    }
+
+    .profile {
+        img {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+    }
+}
+
+// Main Content
+.main-content {
+    padding: 2rem;
+    background: #F3F4F6;
+    flex: 1;
+}
+
+// Footer
+.footer {
+    padding: 1rem;
+    background: white;
+    border-top: 1px solid #E5E7EB;
+}
+
+// Notification Menu
+.notification-menu {
+    width: 300px;
+    padding: 0;
+
+    .dropdown-header {
+        padding: 1rem;
+        background: #F3F4F6;
+        font-weight: 600;
+    }
+
+    .notification-item {
+        display: flex;
+        padding: 1rem;
+        border-bottom: 1px solid #E5E7EB;
+
+        i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        &:hover {
+            background: #F3F4F6;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -$sidebar-width;
+
+        &.active {
+            margin-left: 0;
+        }
+    }
+
+    .content {
+        margin-left: 0;
+    }
+
+    .content.expanded {
+        margin-left: 0;
+    }
+}
+.dashboard-header {
+    h1 {
+        color: $primary-color;
+        font-weight: 600;
+    }
+}
+
+.stat-card {
+    .card-body {
+        padding: 1.5rem;
+    }
+
+    h3 {
+        color: $primary-color;
+        font-weight: 600;
+        font-size: 1.75rem;
+    }
+}
+
+.project-progress {
+    .progress-bar {
+        transition: width 1s ease;
+    }
+}
+
+.notification-list {
+    .notification-item {
+        transition: background-color 0.3s ease;
+
+        &:hover {
+            background-color: #F3F4F6;
+        }
+
+        h6 {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+    }
+}
+@media (max-width: 768px) {
+    .task-card {
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+
+            .task-title {
+                font-weight: 600;
+                color: $primary-color;
+            }
+        }
+
+        .task-info {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+
+            .info-item {
+                span {
+                    display: block;
+                    font-size: 0.875rem;
+
+                    &:first-child {
+                        color: $text-muted;
+                    }
+                }
+            }
+        }
+
+        .task-progress {
+            margin-bottom: 1rem;
+        }
+
+        .task-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+        }
+
+        .subtasks {
+            margin-top: 1rem;
+            padding-left: 1rem;
+            border-left: 2px solid #e5e7eb;
+        }
+    }
+}
+.spb-card {
+    .spb-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+
+        .spb-number {
+            font-weight: 600;
+            color: $primary-color;
+        }
+    }
+
+    .spb-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+
+        .info-item {
+            span {
+                display: block;
+                font-size: 0.875rem;
+
+                &:first-child {
+                    color: $text-muted;
+                }
+            }
+        }
+    }
+
+    .spb-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 1rem;
+    }
+}
+
+// Status colors
+.badge {
+    &.bg-warning {
+        background-color: #FBBF24 !important;
+        color: #000;
+    }
+
+    &.bg-success {
+        background-color: #10B981 !important;
+    }
+
+    &.bg-danger {
+        background-color: #EF4444 !important;
+    }
+
+    &.bg-info {
+        background-color: #3B82F6 !important;
+        color: white;
+    }
+}

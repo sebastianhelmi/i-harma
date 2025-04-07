@@ -1,0 +1,419 @@
+// Variables
+$dark-bg: #1F2937;
+$darker-bg: #111827;
+$lighter-bg: #374151;
+$accent-color: #3B82F6;
+$success-color: #84CC16;
+$text-color: #F9FAFB;
+$text-muted: #9CA3AF;
+$border-color: #4B5563;
+$heading-color: #F3F4F6;
+$link-color: #60A5FA;
+$badge-text: #111827;
+
+$sidebar-width: 250px;
+$sidebar-collapsed-width: 70px;
+$topbar-height: 64px;
+$mobile-nav-height: 60px;
+
+// Base Styles
+body.dark-theme {
+    background-color: $dark-bg;
+    color: $text-color;
+    font-family: 'Manrope', sans-serif;
+    h1,
+        h2,
+        h3,
+        h4,
+        h5,
+        h6 {
+            color: $heading-color;
+        }
+
+        .text-muted {
+            color: $text-muted !important;
+        }
+
+        a {
+            color: $link-color;
+
+            &:hover {
+                color: lighten($link-color, 10%);
+            }
+        }
+}
+
+// Sidebar
+.sidebar {
+    width: $sidebar-width;
+    background: $darker-bg;
+    min-height: 100vh;
+    position: fixed;
+    transition: all 0.3s;
+    border-right: 1px solid $border-color;
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid $border-color;
+
+        .logo {
+            height: 40px;
+            filter: brightness(0) invert(1);
+        }
+
+        .company-name {
+            color: $text-color;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+    }
+
+    .nav-menu {
+        padding: 1rem 0;
+
+        li {
+            a {
+                padding: 0.875rem 1.5rem;
+                display: flex;
+                align-items: center;
+                color: $text-muted;
+                transition: all 0.3s;
+
+                i {
+                    width: 20px;
+                    margin-right: 1rem;
+                }
+
+                .badge {
+                    margin-left: auto;
+                }
+
+                &:hover {
+                    color: $text-color;
+                    background: $lighter-bg;
+                }
+            }
+
+            &.active a {
+                color: $accent-color;
+                background: rgba($accent-color, 0.1);
+                border-left: 3px solid $accent-color;
+                box-shadow: 0 0 20px rgba($accent-color, 0.1);
+            }
+        }
+    }
+
+    &.collapsed {
+        width: $sidebar-collapsed-width;
+
+        .company-name,
+        .nav-menu li a span {
+            display: none;
+        }
+    }
+}
+
+// Topbar
+.topbar {
+    height: $topbar-height;
+    background: $darker-bg;
+    border-bottom: 1px solid $border-color;
+    padding: 0 1.5rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: $sidebar-width;
+    z-index: 1000;
+    transition: all 0.3s;
+
+    .container-fluid {
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .topbar-left {
+        .btn {
+            color: $text-muted;
+            padding: 0.5rem;
+
+            &:hover {
+                color: $text-color;
+            }
+        }
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+// Page header styles
+.page-header {
+    background: $darker-bg;
+    padding: 1.5rem;
+    margin-top: $topbar-height;
+    border-bottom: 1px solid $border-color;
+
+    .page-header-content {
+        .page-title {
+            h1 {
+                color: $text-color;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin: 0;
+            }
+
+            p {
+                color: $text-muted;
+                margin: 0.5rem 0 0;
+            }
+        }
+    }
+}
+
+// Main Content
+.main-content {
+    margin-left: $sidebar-width;
+    transition: all 0.3s;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    &.expanded {
+        margin-left: $sidebar-collapsed-width;
+    }
+
+   // Main content area
+   .content {
+       padding: 1.5rem;
+       margin-top: 1rem;
+   }
+
+   // Responsive adjustments
+   @media (max-width: 768px) {
+       .topbar {
+           left: 0;
+
+           &.sidebar-active {
+               left: $sidebar-width;
+           }
+       }
+
+       .page-header {
+           margin-top: $topbar-height;
+       }
+   }
+}
+
+// Cards and Components
+.card {
+    background: $darker-bg;
+    border: 1px solid $border-color;
+    border-radius: 1rem;
+
+    .card-header {
+        background: transparent;
+        border-bottom-color: $border-color;
+    }
+         color: $text-color;
+
+         .card-header {
+             color: $heading-color;
+         }
+
+         h3 {
+             color: $heading-color;
+         }
+
+         .text-muted {
+             color: $text-muted !important;
+         }
+}
+
+// Buttons
+.btn-primary {
+    background: $accent-color;
+    border-color: $accent-color;
+
+    &:hover {
+        background: lighten($accent-color, 10%);
+        border-color: lighten($accent-color, 10%);
+    }
+}
+
+.btn-success {
+    background: $success-color;
+    border-color: $success-color;
+
+    &:hover {
+        background: lighten($success-color, 10%);
+        border-color: lighten($success-color, 10%);
+    }
+}
+
+// Badges
+.badge {
+    &.bg-accent {
+        background-color: $accent-color !important;
+    }
+    &.bg-accent {
+        color: $badge-text;
+    }
+
+    &.bg-warning {
+        color: $badge-text;
+    }
+
+    &.bg-success {
+        color: $badge-text;
+    }
+
+    &.bg-purple {
+        color: $badge-text;
+    }
+}
+
+// Mobile Navigation
+.mobile-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: $mobile-nav-height;
+    background: $darker-bg;
+    border-top: 1px solid $border-color;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem;
+    z-index: 1000;
+
+    a {
+        color: $text-muted;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 0.75rem;
+
+        i {
+            font-size: 1.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        &.active {
+            color: $accent-color;
+        }
+    }
+}
+
+// Responsive
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -$sidebar-width;
+
+        &.active {
+            margin-left: 0;
+        }
+    }
+
+    .main-content {
+        margin-left: 0;
+        padding-bottom: $mobile-nav-height;
+    }
+}
+
+.table {
+    color: $text-color;
+
+    thead th {
+        color: $heading-color;
+    }
+
+    tbody {
+        td {
+            color: $text-color;
+        }
+
+        .text-muted {
+            color: $text-muted !important;
+        }
+    }
+}
+// When sidebar is collapsed
+body.sidebar-collapsed {
+    .topbar {
+        left: $sidebar-collapsed-width;
+    }
+}
+
+// Notification badge positioning
+.notifications {
+    .badge {
+        border: 2px solid $darker-bg;
+    }
+}
+
+// Profile dropdown
+.profile {
+    .btn {
+        padding: 0.5rem;
+        color: $text-color;
+
+        img {
+            object-fit: cover;
+        }
+    }
+}
+
+// Update dropdown styles
+.dropdown-menu {
+    background: $darker-bg;
+    border-color: $border-color;
+
+    .dropdown-item {
+        color: $text-color;
+
+        &:hover {
+            background: $lighter-bg;
+            color: $text-color;
+        }
+    }
+
+    .dropdown-header {
+        color: $text-muted;
+    }
+
+    .dropdown-divider {
+        border-color: $border-color;
+    }
+}
+
+// Update notification styles
+.notification-list {
+    .notification-item {
+        h6 {
+            color: $heading-color;
+        }
+
+        p {
+            color: $text-muted;
+        }
+    }
+}
+
+// Update vendor list styles
+.vendor-list {
+    .vendor-item {
+        h6 {
+            color: $heading-color;
+        }
+
+        small {
+            color: $text-muted;
+        }
+    }
+}

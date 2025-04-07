@@ -95,7 +95,8 @@
                                 <i class="fas fa-file-alt me-2"></i>
                                 Permintaan SPB Terbaru
                             </h5>
-                            {{-- {{ route('purchasing.spb.index') }} --}}
+                            {{-- {{ route('purchasing.spb.
+                                ') }} --}}
                             <a href="" class="btn btn-sm btn-outline-accent">
                                 Lihat Semua
                             </a>

@@ -33,9 +33,8 @@
                         <span class="badge bg-accent">3</span>
                     </a>
                 </li>
-
-                <li class="{{ request()->routeIs('purchasing.po*') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.po.index') }}">
+                <li class="">
+                    <a href="">
                         <i class="fas fa-shopping-cart"></i>
                         <span>Purchase Order</span>
                     </a>

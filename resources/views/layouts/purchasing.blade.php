@@ -4,171 +4,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ config('app.name') }} - @yield('title', 'Procurement Portal')</title>
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/sass/purchasing.scss'])
+    <title>@yield('title') - Purchasing</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Styles -->
+    @vite(['resources/sass/app.scss', 'resources/sass/purchasing.scss', 'resources/js/app.js'])
     @stack('styles')
 </head>
 
-<body class="dark-theme">
-    <div class="wrapper">
+<body>
+    <div class="layout-wrapper">
         <!-- Sidebar -->
-        <nav id="sidebar" class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <img src="{{ asset('images/logo-dark.png') }}" alt="Logo" class="logo">
-                <span class="company-name">Procurement Portal</span>
+                <img src="{{ asset('images/logo.png') }}" alt="Logo" class="sidebar-logo">
+                <span class="sidebar-title">PurchasingSys</span>
             </div>
 
-            <ul class="nav-menu">
-                <li class="{{ request()->routeIs('purchasing.dashboard') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.dashboard') }}">
-                        <i class="fas fa-box"></i>
-                        <span>Dashboard</span>
-                    </a>
-                </li>
-                <li class="{{ request()->routeIs('purchasing.spb*') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.spb') }}">
-                        <i class="fas fa-file-alt"></i>
-                        <span>SPB Masuk</span>
-                        <span class="badge bg-accent">3</span>
-                    </a>
-                </li>
-                <li class="">
-                    <a href="">
-                        <i class="fas fa-shopping-cart"></i>
-                        <span>Purchase Order</span>
-                    </a>
-                </li>
-                {{--
-                <li class="{{ request()->routeIs('purchasing.vendors*') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.vendors.index') }}">
-                        <i class="fas fa-building"></i>
-                        <span>Vendor & Supplier</span>
-                    </a>
-                </li>
-                <li class="{{ request()->routeIs('purchasing.reports*') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.reports.index') }}">
-                        <i class="fas fa-chart-bar"></i>
-                        <span>Laporan</span>
-                    </a>
-                </li>
-                <li class="{{ request()->routeIs('purchasing.settings*') ? 'active' : '' }}">
-                    <a href="{{ route('purchasing.settings.index') }}">
-                        <i class="fas fa-cog"></i>
-                        <span>Pengaturan</span>
-                    </a>
-                </li> --}}
-            </ul>
-        </nav>
+            <nav class="sidebar-nav">
+                <a href="{{ route('purchasing.dashboard') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.dashboard') ? 'active' : '' }}">
+                    <i class="icon" data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
 
-        <!-- Main Content -->
+                <a href="{{ route('purchasing.orders.index') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.orders.*') ? 'active' : '' }}">
+                    <i class="icon" data-lucide="shopping-cart"></i>
+                    <span>Purchase Orders</span>
+                </a>
+
+                <a href="{{ route('purchasing.suppliers.index') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.suppliers.*') ? 'active' : '' }}">
+                    <i class="icon" data-lucide="users"></i>
+                    <span>Suppliers</span>
+                </a>
+
+                <a href="{{ route('purchasing.reports') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.reports') ? 'active' : '' }}">
+                    <i class="icon" data-lucide="file-text"></i>
+                    <span>Reports</span>
+                </a>
+
+                <a href="{{ route('purchasing.settings') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.settings') ? 'active' : '' }}">
+                    <i class="icon" data-lucide="settings"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+        </aside>
+
         <div class="main-content">
-            <!-- Topbar -->
-            <nav class="topbar">
-                <div class="container-fluid">
-                    <div class="topbar-left">
-                        <button id="sidebarCollapse" class="btn">
-                            <i class="fas fa-bars"></i>
+            <!-- Header -->
+            <header class="header">
+                <button id="sidebarCollapse" class="btn d-md-none">
+                    <i data-lucide="menu"></i>
+                </button>
+
+                <div class="search-box">
+                    <i class="icon" data-lucide="search"></i>
+                    <input type="text" placeholder="Search orders, suppliers...">
+                </div>
+
+                <div class="d-flex align-items-center gap-3">
+                    <button class="notification-btn">
+                        <i data-lucide="bell"></i>
+                        <span class="badge">2</span>
+                    </button>
+
+                    <div class="user-menu dropdown">
+                        <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">
+                            <img src="{{ auth()->user()->avatar ?? 'https://ui-avatars.com/api/?name=PO' }}"
+                                alt="Avatar" class="avatar">
+                            <span class="name">{{ auth()->user()->name }}</span>
                         </button>
-                    </div>
-
-                    <div class="topbar-right">
-                        <!-- Notifications -->
-                        <div class="dropdown notifications me-3">
-                            <button class="btn position-relative" data-bs-toggle="dropdown">
-                                <i class="fas fa-bell"></i>
-                                <span
-                                    class="badge bg-accent position-absolute top-0 start-100 translate-middle">5</span>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end notification-menu">
-                                <h6 class="dropdown-header">Notifikasi</h6>
-                                <div class="notification-item">
-                                    <i class="fas fa-file-alt text-accent"></i>
-                                    <div class="notification-content">
-                                        <p class="mb-0">SPB baru dari Proyek A</p>
-                                        <small>5 menit yang lalu</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-center" href="#">Lihat Semua</a>
-                            </div>
-                        </div>
-
-                        <!-- User Profile -->
-                        <div class="dropdown profile">
-                            <button class="btn d-flex align-items-center" data-bs-toggle="dropdown">
-                                <img src="{{ auth()->user()->avatar ?? asset('images/default-avatar.png') }}"
-                                    class="rounded-circle me-2" alt="Profile" width="32" height="32">
-                                <div class="d-none d-md-block text-start">
-                                    <div class="fw-medium text-light">{{ auth()->user()->name }}</div>
-                                    <small class="text-muted">Purchasing</small>
-                                </div>
-                            </button>
-                            <div class="dropdown-menu dropdown-menu-end">
-                                {{-- {{ route('purchasing.profile') }} --}}
-                                <a class="dropdown-item" href="">
-                                    <i class="fas fa-user me-2"></i> Profil
-                                </a>
-                                {{-- {{ route('purchasing.settings.password') }} --}}
-                                <a class="dropdown-item" href="">
-                                    <i class="fas fa-key me-2"></i> Ganti Password
-                                </a>
-                                <div class="dropdown-divider"></div>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#">Profile</a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
                                 <form action="{{ route('logout') }}" method="POST">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">
-                                        <i class="fas fa-sign-out-alt me-2"></i> Logout
-                                    </button>
+                                    <button type="submit" class="dropdown-item">Logout</button>
                                 </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Page Header -->
-            <header class="page-header">
-                <div class="container-fluid">
-                    <div class="page-header-content">
-                        <div class="page-title">
-                            <h1>@yield('page-title')</h1>
-                            @yield('page-subtitle')
-                        </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </header>
+
+            <!-- Breadcrumb -->
+            @hasSection('breadcrumb')
+                <nav aria-label="breadcrumb" class="breadcrumb-wrapper">
+                    <ol class="breadcrumb">
+                        @yield('breadcrumb')
+                    </ol>
+                </nav>
+            @endif
 
             <!-- Main Content Area -->
             <main class="content">
                 @yield('content')
             </main>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <p class="mb-0">&copy; {{ date('Y') }} PurchasingSys. All rights reserved.</p>
+            </footer>
         </div>
     </div>
 
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav d-md-none">
-        <a href="{{ route('purchasing.dashboard') }}"
-            class="{{ request()->routeIs('purchasing.dashboard') ? 'active' : '' }}">
-            <i class="fas fa-box"></i>
-            <span>Dashboard</span>
-        </a>
-        <a href="{{ route('purchasing.spb') }}" class="{{ request()->routeIs('purchasing.spb*') ? 'active' : '' }}">
-            <i class="fas fa-file-alt"></i>
-            <span>SPB</span>
-        </a>
-        {{--
-        <a href="{{ route('purchasing.po.index') }}"
-            class="{{ request()->routeIs('purchasing.po*') ? 'active' : '' }}">
-            <i class="fas fa-shopping-cart"></i>
-            <span>PO</span>
-        </a>
-        <a href="{{ route('purchasing.profile') }}"
-            class="{{ request()->routeIs('purchasing.profile') ? 'active' : '' }}">
-            <i class="fas fa-user"></i>
-            <span>Profil</span>
-        </a>
-        --}}
-    </nav>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        lucide.createIcons();
+    </script>
     @stack('scripts')
 </body>
 

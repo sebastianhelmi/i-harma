@@ -98,12 +98,6 @@
                                 <td><span class="badge bg-warning text-dark">Pending</span></td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-success" title="Setujui">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-danger" title="Tolak">
-                                            <i class="fas fa-times"></i>
-                                        </button>
                                         <button class="btn btn-sm btn-primary" title="Lihat Detail" data-bs-toggle="modal"
                                             data-bs-target="#spbDetailModal">
                                             <i class="fas fa-eye"></i>

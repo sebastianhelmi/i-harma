@@ -17,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
             Route::middleware('web')
                 ->group(base_path('routes/head-of-division.php'));
             Route::middleware('web')
+                ->group(base_path('routes/delivery.php'));
+            Route::middleware('web')
+                ->group(base_path('routes/purchasing.php'));
+            Route::middleware('web')
                 ->group(base_path('routes/inventory.php'));
         }
     )

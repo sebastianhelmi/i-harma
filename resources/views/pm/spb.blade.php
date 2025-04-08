@@ -16,9 +16,6 @@
                     </ol>
                 </nav>
             </div>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createSpbModal">
-                <i class="fas fa-plus me-2"></i>Buat SPB Baru
-            </button>
         </div>
 
         <!-- Filter Section -->
@@ -94,14 +91,20 @@
                                 </td>
                                 <td>
                                     <div class="btn-group">
-                                        <button class="btn btn-sm btn-outline-primary" title="Lihat Detail">
+                                        <button class="btn btn-sm btn-outline-primary" title="Lihat Detail"
+                                            data-bs-toggle="modal" data-bs-target="#viewSpbModal" data-spb-id="1"
+                                            data-spb-number="SPB-001" data-spb-date="04 Apr 2025" data-project="Proyek A"
+                                            data-task="Buat Meja Workshop" data-category="Workshop" data-status="pending"
+                                            data-po-status="Belum PO">
                                             <i class="fas fa-eye"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-secondary" title="Edit">
-                                            <i class="fas fa-edit"></i>
+                                        <button class="btn btn-sm btn-outline-success approve-spb" title="Setujui"
+                                            data-id="1">
+                                            <i class="fas fa-check"></i>
                                         </button>
-                                        <button class="btn btn-sm btn-outline-danger" title="Hapus">
-                                            <i class="fas fa-trash"></i>
+                                        <button class="btn btn-sm btn-outline-danger reject-spb" title="Tolak"
+                                            data-id="1">
+                                            <i class="fas fa-times"></i>
                                         </button>
                                     </div>
                                 </td>
@@ -180,93 +183,104 @@
         </nav>
     </div>
 
-    <!-- Create SPB Modal -->
-    <div class="modal fade" id="createSpbModal" tabindex="-1">
+    <!-- View SPB Modal -->
+    <div class="modal fade" id="viewSpbModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Buat SPB Baru</h5>
+                    <h5 class="modal-title">Detail SPB</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Proyek</label>
-                                <select class="form-select">
-                                    <option value="">Pilih Proyek</option>
-                                    <option value="1">Proyek A</option>
-                                    <option value="2">Proyek B</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Tugas Terkait</label>
-                                <select class="form-select">
-                                    <option value="">Pilih Tugas</option>
-                                    <option value="1">Buat Meja Workshop</option>
-                                    <option value="2">Pasang Atap</option>
-                                </select>
-                            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <p><strong>Nomor SPB:</strong> <span id="spbNumber"></span></p>
+                            <p><strong>Tanggal:</strong> <span id="spbDate"></span></p>
+                            <p><strong>Proyek:</strong> <span id="spbProject"></span></p>
+                            <p><strong>Tugas Terkait:</strong> <span id="spbTask"></span></p>
+                            <p><strong>Diajukan Oleh:</strong> <span id="requestedBy">Electrical</span></p>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Kategori</label>
-                                <select class="form-select">
-                                    <option value="">Pilih Kategori</option>
-                                    <option value="workshop">Workshop</option>
-                                    <option value="site">Site</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Tanggal Kebutuhan</label>
-                                <input type="date" class="form-control">
-                            </div>
+                        <div class="col-md-6">
+                            <p><strong>Status SPB:</strong> <span id="spbStatus"></span></p>
+                            <p><strong>Status PO:</strong> <span id="poStatus"></span></p>
+                            <p><strong>Kategori Item:</strong> <span id="itemCategory"></span></p>
+                            <p><strong>Kategori Entry:</strong> <span id="categoryEntry"></span></p>
+                            <p><strong>Catatan:</strong> <span id="remarks"></span></p>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Catatan</label>
-                            <textarea class="form-control" rows="3"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Item yang Diminta</label>
-                            <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>Nama Item</th>
-                                            <th>Jumlah</th>
-                                            <th>Satuan</th>
-                                            <th>Aksi</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><input type="text" class="form-control form-control-sm"></td>
-                                            <td><input type="number" class="form-control form-control-sm"></td>
-                                            <td><input type="text" class="form-control form-control-sm"></td>
-                                            <td>
-                                                <button type="button" class="btn btn-sm btn-danger">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <button type="button" class="btn btn-sm btn-secondary">
-                                <i class="fas fa-plus me-1"></i>Tambah Item
-                            </button>
-                        </div>
-                    </form>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                    <th>Keterangan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spbItems">
+                                <tr>
+                                    <td>Semen</td>
+                                    <td>10</td>
+                                    <td>Sak</td>
+                                    <td>Urgent</td>
+                                </tr>
+                                <tr>
+                                    <td>Pasir</td>
+                                    <td>2</td>
+                                    <td>Truk</td>
+                                    <td>-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <div id="approvalButtons">
+                        <button type="button" class="btn btn-success approve-spb" data-id="">Setujui</button>
+                        <button type="button" class="btn btn-danger reject-spb" data-id="">Tolak</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 @endsection
 
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Populate modal with data when shown
+            const viewModal = document.getElementById('viewSpbModal');
+            viewModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                const spbId = button.dataset.spbId;
+                const spbNumber = button.dataset.spbNumber;
+                const spbDate = button.dataset.spbDate;
+                const project = button.dataset.project;
+                const task = button.dataset.task;
+                const category = button.dataset.category;
+                const status = button.dataset.status;
+                const poStatus = button.dataset.poStatus;
+
+                // Set modal content
+                viewModal.querySelector('#spbNumber').textContent = spbNumber;
+                viewModal.querySelector('#spbDate').textContent = spbDate;
+                viewModal.querySelector('#spbProject').textContent = project;
+                viewModal.querySelector('#spbTask').textContent = task;
+                viewModal.querySelector('#itemCategory').textContent = category;
+                viewModal.querySelector('#spbStatus').textContent = status;
+                viewModal.querySelector('#poStatus').textContent = poStatus;
+
+                // Show/hide approval buttons based on status
+                const approvalButtons = viewModal.querySelector('#approvalButtons');
+                approvalButtons.style.display = status === 'pending' ? 'block' : 'none';
+            });
+
+            // ...existing approval and rejection handlers...
+        });
+    </script>
+@endpush
 @push('styles')
     <style>
         .badge {

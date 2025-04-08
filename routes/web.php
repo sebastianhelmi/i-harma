@@ -8,28 +8,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect()->route('login');
-});
+})->middleware('guest');
 
 // Auth Routes
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [LoginController::class, 'login']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login')->middleware('guest');
+Route::post('/login', [LoginController::class, 'login'])->middleware('guest');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Protected Routes with Role Middleware
-Route::middleware(['auth', 'role:Project Manager'])->group(function () {
-    Route::get('/pm/dashboard', function () {
-        return view('pm.dashboard');
-    })->name('pm.dashboard');
-    Route::get('/pm/project', function () {
-        return view('pm.project');
-    })->name('pm.project');
-    Route::get('/pm/tasks', function () {
-        return view('pm.tasks');
-    })->name('pm.tasks');
-    Route::get('/pm/spb', function () {
-        return view('pm.spb');
-    })->name('pm.spb');
-});
+require __DIR__ . '/project-manager.php';
 
 Route::prefix('admin')->middleware(['auth', 'role:Admin'])->group(function () {
     // Dashboard route

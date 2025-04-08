@@ -99,9 +99,6 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Andi" class="rounded-circle me-2"
-                                            width="24">
-                                        Andi
                                     </div>
                                 </td>
                                 <td>
@@ -110,6 +107,10 @@
                                         <button class="btn btn-sm btn-outline-secondary"><i
                                                 class="fas fa-edit"></i></button>
                                         <button class="btn btn-sm btn-outline-danger"><i class="fas fa-trash"></i></button>
+                                        <button class="btn btn-sm btn-outline-info add-subtask" data-task-id="1">
+                                            {{-- data-task-id="{{ $task->id }}" --}}
+                                            <i class="fas fa-plus"></i>
+                                        </button>
                                     </div>
                                 </td>
                             </tr>
@@ -129,9 +130,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Budi" class="rounded-circle me-2"
+                                        <img src="https://ui-avatars.com/api/?name=El" class="rounded-circle me-2"
                                             width="24">
-                                        Budi
+                                        Electrical
                                     </div>
                                 </td>
                                 <td>
@@ -176,46 +177,99 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="taskForm">
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nama Tugas</label>
-                                <input type="text" class="form-control">
+                                <input type="text" class="form-control" name="name" required>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Proyek</label>
-                                <select class="form-select">
-                                    <option>Pilih Proyek</option>
-                                    <option>Gedung A</option>
-                                    <option>Pabrik X</option>
-                                    <option>Gudang Y</option>
+                                <select class="form-select" name="project_id" required>
+                                    <option value="">Pilih Proyek</option>
+                                    <option value="1">Gedung A</option>
+                                    <option value="2">Pabrik X</option>
+                                    <option value="3">Gudang Y</option>
                                 </select>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Deadline</label>
-                                <input type="date" class="form-control">
+                                <input type="date" class="form-control" name="due_date" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Ditugaskan Ke</label>
-                                <select class="form-select">
-                                    <option>Pilih Staff</option>
-                                    <option>Andi</option>
-                                    <option>Budi</option>
-                                    <option>Dedi</option>
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
                                 </select>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Deskripsi</label>
-                            <textarea class="form-control" rows="3"></textarea>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary">Simpan</button>
+                    <button type="button" class="btn btn-primary" id="saveTask">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Subtask Modal -->
+    <div class="modal fade" id="addSubtaskModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah Sub Tugas</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="subtaskForm">
+                        <input type="hidden" name="parent_task_id" id="parentTaskId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama Sub Tugas</label>
+                                <input type="text" class="form-control" name="name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Ditugaskan Ke</label>
+                                <select class="form-select" name="assigned_to" required>
+                                    <option value="">Pilih Staff</option>
+                                    <option value="1">Andi</option>
+                                    <option value="2">Budi</option>
+                                    <option value="3">Dedi</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Deadline</label>
+                                <input type="date" class="form-control" name="due_date" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status</label>
+                                <select class="form-select" name="status" required>
+                                    <option value="pending">Pending</option>
+                                    <option value="in_progress">In Progress</option>
+                                    <option value="completed">Completed</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveSubtask">Simpan</button>
                 </div>
             </div>
         </div>
@@ -284,6 +338,15 @@
                 row.addEventListener('click', () => {
                     const button = row.querySelector('.toggle-subtasks');
                     button.click();
+                });
+            });
+
+            document.querySelectorAll('.add-subtask').forEach(button => {
+                button.addEventListener('click', () => {
+                    const taskId = button.dataset.taskId;
+                    document.getElementById('parentTaskId').value = 1;
+                    const modal = new bootstrap.Modal(document.getElementById('addSubtaskModal'));
+                    modal.show();
                 });
             });
         });

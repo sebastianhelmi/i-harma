@@ -206,24 +206,41 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <form>
+                    <form id="addProjectForm">
                         <div class="mb-3">
                             <label class="form-label">Nama Proyek</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" name="name" required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Lokasi</label>
-                            <input type="text" class="form-control">
+                            <input type="text" class="form-control" name="location" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Deskripsi</label>
+                            <textarea class="form-control" name="description" rows="3"></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Tanggal Mulai</label>
-                                <input type="date" class="form-control">
+                                <input type="date" class="form-control" name="start_date" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Deadline</label>
-                                <input type="date" class="form-control">
+                                <label class="form-label">Tanggal Selesai</label>
+                                <input type="date" class="form-control" name="end_date">
                             </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Status</label>
+                            <select class="form-select" name="status" required>
+                                <option value="pending">Pending</option>
+                                <option value="ongoing">Ongoing</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">File Proyek</label>
+                            <input type="file" class="form-control" name="files[]" multiple>
+                            <small class="text-muted">Dapat memilih lebih dari satu file</small>
                         </div>
                     </form>
                 </div>

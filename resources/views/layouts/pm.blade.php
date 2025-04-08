@@ -94,8 +94,8 @@
 
                         <div class="dropdown profile">
                             <button class="btn d-flex align-items-center" data-bs-toggle="dropdown">
-                                <img src="{{ auth()->user()->avatar ?? asset('images/default-avatar.png') }}"
-                                    class="rounded-circle me-2" alt="Profile">
+                                <img src="https://ui-avatars.com/api/?name=pm" class="rounded-circle me-2"
+                                    alt="Profile">
                                 <span class="d-none d-md-block">{{ auth()->user()->name }}</span>
                             </button>
                             <div class="dropdown-menu dropdown-menu-end">
@@ -130,6 +130,7 @@
             </footer>
         </div>
     </div>
+    @stack('scripts')
 </body>
 
 </html>

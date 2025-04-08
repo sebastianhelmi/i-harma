@@ -110,8 +110,8 @@
                         <!-- User Profile -->
                         <div class="dropdown profile">
                             <button class="btn d-flex align-items-center" data-bs-toggle="dropdown">
-                                <img src="{{ auth()->user()->avatar ?? asset('images/default-avatar.png') }}"
-                                    class="rounded-circle me-2" alt="Profile">
+                                <img src="https://ui-avatars.com/api/?name=div class="rounded-circle me-2"
+                                    alt="Profile">
                                 <div class="d-none d-md-block text-start">
                                     <div class="fw-medium">{{ auth()->user()->name }}</div>
                                     <small class="text-muted">Kepala Divisi</small>

@@ -23,11 +23,19 @@
         <div class="card border-0 shadow-sm mb-4">
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-md-3">
                         <div class="input-group">
                             <span class="input-group-text"><i class="fas fa-search"></i></span>
                             <input type="text" class="form-control" placeholder="Cari tugas...">
                         </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select class="form-select" id="projectFilter">
+                            <option value="">Semua Proyek</option>
+                            <option value="1">Proyek A</option>
+                            <option value="2">Proyek B</option>
+                            <option value="3">Proyek C</option>
+                        </select>
                     </div>
                     <div class="col-md-3">
                         <select class="form-select" id="statusFilter">
@@ -40,9 +48,9 @@
                     <div class="col-md-3">
                         <select class="form-select" id="memberFilter">
                             <option value="">Semua Anggota</option>
-                            <option value="andi">Andi</option>
-                            <option value="budi">Budi</option>
-                            <option value="rina">Rina</option>
+                            <option value="andi">Electrical</option>
+                            <option value="budi">Electrical</option>
+                            <option value="rina">Electrical</option>
                         </select>
                     </div>
                 </div>
@@ -80,9 +88,7 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Andi" class="rounded-circle me-2"
-                                            width="32" height="32">
-                                        <span>Andi</span>
+                                        <span></span>
                                     </div>
                                 </td>
                                 <td>2025-04-25</td>
@@ -120,9 +126,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Andi" class="rounded-circle me-2"
+                                        <img src="https://ui-avatars.com/api/?name=el" class="rounded-circle me-2"
                                             width="32" height="32">
-                                        <span>Andi</span>
+                                        <span>Electrical</span>
                                     </div>
                                 </td>
                                 <td>2025-04-20</td>
@@ -156,9 +162,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Budi" class="rounded-circle me-2"
+                                        <img src="https://ui-avatars.com/api/?name=el" class="rounded-circle me-2"
                                             width="32" height="32">
-                                        <span>Budi</span>
+                                        <span>Electrical</span>
                                     </div>
                                 </td>
                                 <td>2025-04-23</td>
@@ -193,9 +199,9 @@
                                 </td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name=Rina" class="rounded-circle me-2"
+                                        <img src="https://ui-avatars.com/api/?name=el" class="rounded-circle me-2"
                                             width="32" height="32">
-                                        <span>Rina</span>
+                                        <span>Electrical</span>
                                     </div>
                                 </td>
                                 <td>2025-04-30</td>
@@ -306,6 +312,39 @@
                     });
                 });
             });
+            // Handle filters
+            const projectFilter = document.getElementById('projectFilter');
+            const statusFilter = document.getElementById('statusFilter');
+            const memberFilter = document.getElementById('memberFilter');
+            const searchInput = document.querySelector('input[type="text"]');
+
+            function filterTasks() {
+                const project = projectFilter.value;
+                const status = statusFilter.value;
+                const member = memberFilter.value;
+                const search = searchInput.value.toLowerCase();
+
+                const tasks = document.querySelectorAll('tr.task-main');
+                tasks.forEach(task => {
+                    const projectMatch = !project || task.dataset.project === project;
+                    const statusMatch = !status || task.querySelector('.badge').textContent.toLowerCase()
+                        .includes(status);
+                    const memberMatch = !member || task.querySelector('td:nth-child(2)').textContent
+                        .toLowerCase().includes(member);
+                    const searchMatch = !search || task.textContent.toLowerCase().includes(search);
+
+                    if (projectMatch && statusMatch && memberMatch && searchMatch) {
+                        task.style.display = '';
+                    } else {
+                        task.style.display = 'none';
+                    }
+                });
+            }
+
+            projectFilter.addEventListener('change', filterTasks);
+            statusFilter.addEventListener('change', filterTasks);
+            memberFilter.addEventListener('change', filterTasks);
+            searchInput.addEventListener('input', filterTasks);
         });
     </script>
 @endpush

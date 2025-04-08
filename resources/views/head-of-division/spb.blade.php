@@ -14,8 +14,15 @@
                     <li class="breadcrumb-item active">SPB</li>
                 </ol>
             </nav>
-            <h1 class="h3 mb-2 text-gray-800">Daftar SPB</h1>
-            <p class="text-muted">Kelola pengajuan barang dari anggota divisi Anda.</p>
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-2 text-gray-800">Daftar SPB</h1>
+                    <p class="text-muted">Kelola pengajuan barang dari anggota divisi Anda.</p>
+                </div>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addSpbModal">
+                    <i class="fas fa-plus me-2"></i>Tambah SPB
+                </button>
+            </div>
         </div>
 
         <!-- Filter Section -->
@@ -228,7 +235,188 @@
             </div>
         </div>
     </div>
+    <!-- Add SPB Modal -->
+    <div class="modal fade" id="addSpbModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Tambah SPB Baru</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="spbForm">
+                        <!-- Common Fields -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Proyek</label>
+                                <select class="form-select" name="project_id" required>
+                                    <option value="">Pilih Proyek</option>
+                                    <option value="1">Rumah Tinggal A</option>
+                                    <option value="2">Gudang Logistik</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Tugas Terkait</label>
+                                <select class="form-select" name="task_id">
+                                    <option value="">Pilih Tugas (Opsional)</option>
+                                    <option value="1">Pengecoran Lantai</option>
+                                    <option value="2">Pemasangan Atap</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Kategori Item</label>
+                                <select class="form-select" name="item_category_id" required>
+                                    <option value="">Pilih Kategori</option>
+                                    <option value="1">Material</option>
+                                    <option value="2">Peralatan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Kategori Entry</label>
+                                <select class="form-select" name="category_entry" id="categoryEntry" required>
+                                    <option value="">Pilih Kategori Entry</option>
+                                    <option value="site">Site</option>
+                                    <option value="workshop">Workshop</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Site SPB Form -->
+                        <div id="siteForm" style="display: none;">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Daftar Item Site</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addSiteItem">
+                                        <i class="fas fa-plus"></i> Tambah Item
+                                    </button>
+                                </div>
+                                <div id="siteItems">
+                                    <!-- Item template will be cloned here -->
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Dokumen Pendukung</label>
+                                <input type="file" class="form-control" name="document_file[]" multiple>
+                            </div>
+                        </div>
+
+                        <!-- Workshop SPB Form -->
+                        <div id="workshopForm" style="display: none;">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <h6 class="mb-0">Daftar Item Workshop</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="addWorkshopItem">
+                                        <i class="fas fa-plus"></i> Tambah Item
+                                    </button>
+                                </div>
+                                <div id="workshopItems">
+                                    <!-- Item template will be cloned here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Templates -->
+                        <template id="siteItemTemplate">
+                            <div class="row mb-2 site-item">
+                                <div class="col-md-4">
+                                    <input type="text" class="form-control" name="item_name[]"
+                                        placeholder="Nama Item" required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" class="form-control" name="quantity[]" placeholder="Jumlah"
+                                        required>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="text" class="form-control" name="unit[]" placeholder="Satuan"
+                                        required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="information[]"
+                                        placeholder="Keterangan">
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-sm remove-item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template id="workshopItemTemplate">
+                            <div class="row mb-2 workshop-item">
+                                <div class="col-md-5">
+                                    <textarea class="form-control" name="explanation_items[]" placeholder="Penjelasan Item" required></textarea>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="number" class="form-control" name="quantity[]" placeholder="Jumlah"
+                                        required>
+                                </div>
+                                <div class="col-md-3">
+                                    <input type="text" class="form-control" name="unit[]" placeholder="Satuan"
+                                        required>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-sm remove-item">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </template>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-primary" id="saveSpb">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const categoryEntry = document.getElementById('categoryEntry');
+            const siteForm = document.getElementById('siteForm');
+            const workshopForm = document.getElementById('workshopForm');
+            const addSiteItem = document.getElementById('addSiteItem');
+            const addWorkshopItem = document.getElementById('addWorkshopItem');
+            const siteItemTemplate = document.getElementById('siteItemTemplate');
+            const workshopItemTemplate = document.getElementById('workshopItemTemplate');
+
+            // Handle category entry change
+            categoryEntry.addEventListener('change', function() {
+                siteForm.style.display = this.value === 'site' ? 'block' : 'none';
+                workshopForm.style.display = this.value === 'workshop' ? 'block' : 'none';
+            });
+
+            // Add site item
+            addSiteItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                const clone = siteItemTemplate.content.cloneNode(true);
+                document.getElementById('siteItems').appendChild(clone);
+            });
+
+            // Add workshop item
+            addWorkshopItem.addEventListener('click', function(e) {
+                e.preventDefault();
+                const clone = workshopItemTemplate.content.cloneNode(true);
+                document.getElementById('workshopItems').appendChild(clone);
+            });
+
+            // Remove item
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-item') || e.target.parentElement.classList.contains(
+                        'remove-item')) {
+                    const button = e.target.closest('.remove-item');
+                    button.closest('.site-item, .workshop-item').remove();
+                }
+            });
+        });
+    </script>
+@endpush
 
 @push('styles')
     <style>

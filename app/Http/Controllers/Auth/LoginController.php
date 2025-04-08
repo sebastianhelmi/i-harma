@@ -31,6 +31,8 @@ class LoginController extends Controller
                 'Admin' => redirect()->route('admin.dashboard'),
                 'Purchasing' => redirect()->route('purchasing.dashboard'),
                 'Kepala Divisi' => redirect()->route('head-of-division.dashboard'),
+                'Delivery' => redirect()->route('delivery.dashboard'),
+                'Inventory' => redirect()->route('inventory.dashboard'),
                 default => redirect()->route('home'),
             };
         }

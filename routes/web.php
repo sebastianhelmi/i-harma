@@ -66,6 +66,7 @@ Route::prefix('admin')->middleware(['auth', 'role:Admin'])->group(function () {
         ->name('admin.inventory.update-stock');
 });
 
+
 Route::middleware(['auth', 'role:Purchasing'])->group(function () {
     Route::get('/purchasing/dashboard', function () {
         return view('purchasing.dashboard');
@@ -75,4 +76,5 @@ Route::middleware(['auth', 'role:Purchasing'])->group(function () {
     })->name('purchasing.spb');
 });
 
+require __DIR__ . '/inventory.php';
 require __DIR__ . '/head-of-division.php';

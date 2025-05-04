@@ -27,13 +27,13 @@
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('head-of-division.projects*') ? 'active' : '' }}">
-                    <a href="{{ route('head-of-division.projects') }}">
+                    <a href="{{ route('head-of-division.projects.index') }}">
                         <i class="fas fa-folder"></i>
                         <span>Proyek</span>
                     </a>
                 </li>
                 <li class="{{ request()->routeIs('head-of-division.tasks*') ? 'active' : '' }}">
-                    <a href="{{ route('head-of-division.tasks') }}">
+                    <a href="{{ route('head-of-division.tasks.index') }}">
                         <i class="fas fa-tasks"></i>
                         <span>Tugas</span>
                     </a>
@@ -46,8 +46,8 @@
                         <span>Laporan</span>
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('head-of-division.spb*') ? 'active' : '' }}">
-                    <a href="{{ route('head-of-division.spb') }}">
+                <li class="{{ request()->routeIs('head-of-division.spbs*') ? 'active' : '' }}">
+                    <a href="{{ route('head-of-division.spbs.index') }}">
                         <i class="fas fa-file-alt"></i>
                         <span>SPB</span>
                     </a>

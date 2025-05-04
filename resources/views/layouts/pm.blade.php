@@ -25,22 +25,22 @@
                         <span>Dashboard</span>
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('pm.project*') ? 'active' : '' }}">
-                    <a href="{{ route('pm.project') }}">
+                <li class="{{ request()->routeIs('pm.projects*') ? 'active' : '' }}">
+                    <a href="{{ route('pm.projects.index') }}">
                         <i class="fas fa-building"></i>
                         <span>Proyek</span>
                     </a>
                 </li>
 
                 <li class="{{ request()->routeIs('pm.tasks*') ? 'active' : '' }}">
-                    <a href="{{ route('pm.tasks') }}">
+                    <a href="{{ route('pm.tasks.index') }}">
                         <i class="fas fa-tasks"></i>
                         <span>Tugas</span>
                     </a>
                 </li>
 
-                <li class="{{ request()->routeIs('pm.spb*') ? 'active' : '' }}">
-                    <a href="{{ route('pm.spb') }}">
+                <li class="{{ request()->routeIs('pm.spb-approvals*') ? 'active' : '' }}">
+                    <a href="{{ route('pm.spb-approvals.index') }}">
                         <i class="fas fa-file-alt"></i>
                         <span>SPB</span>
                     </a>

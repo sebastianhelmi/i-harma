@@ -46,6 +46,13 @@ return [
             'throw' => false,
             'report' => false,
         ],
+        'spb-documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/spb-documents'),
+            'url' => env('APP_URL').'/storage/spb-documents',
+            'visibility' => 'public',
+            'throw' => false,
+        ],
 
         's3' => [
             'driver' => 's3',

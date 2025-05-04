@@ -15,4 +15,9 @@ class ItemCategory extends Model
     {
         return $this->hasMany(Inventory::class, 'item_category_id');
     }
+
+    public function spbs()
+    {
+        return $this->hasMany(Spb::class);
+    }
 }

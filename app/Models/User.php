@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'division_id',
         'is_active',
     ];
 
@@ -78,5 +79,15 @@ class User extends Authenticatable
     public function getRoleLabel()
     {
         return $this->role->name;
+    }
+
+    public function division()
+    {
+        return $this->belongsTo(Division::class);
+    }
+
+    public function isKepalaDivisi(): bool
+    {
+        return $this->role->name === 'Kepala Divisi';
     }
 }

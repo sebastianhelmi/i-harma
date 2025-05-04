@@ -30,8 +30,13 @@
                     <span>Dashboard</span>
                 </a>
 
-                <a href="{{ route('purchasing.orders.index') }}"
-                    class="nav-item {{ request()->routeIs('purchasing.orders.*') ? 'active' : '' }}">
+                <a href="{{ route('purchasing.spbs.index') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.spbs.*') ? 'active' : '' }}">
+                    <i class="fas fa-file-alt"></i>
+                    <span>SPB</span>
+                </a>
+                <a href="{{ route('purchasing.pos.index') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.pos.*') ? 'active' : '' }}">
                     <i class="icon" data-lucide="shopping-cart"></i>
                     <span>Purchase Orders</span>
                 </a>

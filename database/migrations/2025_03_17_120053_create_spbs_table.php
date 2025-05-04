@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('item_category_id')->constrained('item_categories')->onDelete('restrict'); // Kategori Item
             $table->enum('category_entry', ['workshop', 'site'])->default('site'); // Kategori SPB
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending'); // Status SPB
-            $table->enum('status_po', ['not_required', 'pending', 'ordered', 'completed'])->default('not_required');
+            $table->enum('status_po', ['waiting', 'not_required', 'pending', 'ordered', 'completed'])->default('not_required');
             $table->text('remarks')->nullable(); // Catatan tambahan
             $table->timestamp('approved_at')->nullable(); // Waktu persetujuan
             $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('set null'); // User yang menyetujui

@@ -18,10 +18,10 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     <!-- Search & Filter -->
@@ -30,11 +30,8 @@
             <form action="{{ route('purchasing.pos.index') }}" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="Cari PO Number/Supplier..."
-                               value="{{ request('search') }}">
+                        <input type="text" name="search" class="form-control" placeholder="Cari PO Number/Supplier..."
+                            value="{{ request('search') }}">
                         <button class="btn btn-outline-secondary" type="submit">
                             <i class="fas fa-search"></i>
                         </button>
@@ -44,18 +41,18 @@
                     <select name="status" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Status</option>
                         @foreach($statuses as $value => $label)
-                            <option value="{{ $value }}" @selected(request('status') == $value)>
-                                {{ $label }}
-                            </option>
+                        <option value="{{ $value }}" @selected(request('status')==$value)>
+                            {{ $label }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
                 @if(request('search') || request('status'))
-                    <div class="col-md-2">
-                        <a href="{{ route('purchasing.pos.index') }}" class="btn btn-light">
-                            <i class="fas fa-times me-2"></i>Reset
-                        </a>
-                    </div>
+                <div class="col-md-2">
+                    <a href="{{ route('purchasing.pos.index') }}" class="btn btn-light">
+                        <i class="fas fa-times me-2"></i>Reset
+                    </a>
+                </div>
                 @endif
             </form>
         </div>
@@ -80,49 +77,52 @@
                     </thead>
                     <tbody>
                         @forelse($pos as $po)
-                            <tr>
-                                <td>{{ $po->po_number }}</td>
-                                <td>
-                                    <a href="{{ route('purchasing.spbs.show', $po->spb_id) }}">
-                                        {{ $po->spb->spb_number }}
+                        <tr>
+                            <td>{{ $po->po_number }}</td>
+                            <td>
+                                <a href="{{ route('purchasing.spbs.show', $po->spb_id) }}">
+                                    {{ $po->spb->spb_number }}
+                                </a>
+                            </td>
+                            <td>{{ $po->supplier->name }}</td>
+                            <td>{{ $po->order_date->format('d/m/Y') }}</td>
+                            <td>{{ number_format($po->total_amount, 0, ',', '.') }}</td>
+                            <td>
+                                <span
+                                    class="badge bg-{{ $po->status === 'pending' ? 'warning' : ($po->status === 'completed' ? 'success' : 'danger') }}">
+                                    {{ $statuses[$po->status] }}
+                                </span>
+                            </td>
+                            <td>{{ $po->creator->name }}</td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ route('purchasing.pos.show', $po) }}" class="btn btn-sm btn-info"
+                                        title="Detail">
+                                        <i class="fas fa-eye"></i>
                                     </a>
-                                </td>
-                                <td>{{ $po->supplier->name }}</td>
-                                <td>{{ $po->order_date->format('d/m/Y') }}</td>
-                                <td>{{ number_format($po->total_amount, 0, ',', '.') }}</td>
-                                <td>
-                                    <span class="badge bg-{{ $po->status === 'pending' ? 'warning' : ($po->status === 'completed' ? 'success' : 'danger') }}">
-                                        {{ $statuses[$po->status] }}
-                                    </span>
-                                </td>
-                                <td>{{ $po->creator->name }}</td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('purchasing.pos.show', $po) }}"
-                                           class="btn btn-sm btn-info">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        @if($po->status === 'pending')
-                                            <button type="button"
-                                                    class="btn btn-sm btn-success"
-                                                    onclick="confirmComplete('{{ $po->id }}')">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-danger"
-                                                    onclick="confirmCancel('{{ $po->id }}')">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    <a href="{{ route('purchasing.pos.print', $po) }}" class="btn btn-sm btn-primary"
+                                        title="Cetak" target="_blank">
+                                        <i class="fas fa-print"></i>
+                                    </a>
+                                    @if($po->status === 'pending')
+                                    <a href="{{ route('purchasing.pos.edit', $po) }}" class="btn btn-warning btn-sm"
+                                        title="Edit">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger" title="Batalkan"
+                                        onclick="confirmCancel('{{ $po->id }}')">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    Tidak ada data Purchase Order
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                Tidak ada data Purchase Order
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -148,7 +148,11 @@
 
 @push('scripts')
 <script>
-function confirmComplete(id) {
+    document.addEventListener('DOMContentLoaded', function() {
+    const tooltips = document.querySelectorAll('[title]');
+    tooltips.forEach(tooltip => new bootstrap.Tooltip(tooltip));
+    });
+    function confirmComplete(id) {
     if (confirm('Apakah Anda yakin ingin menyelesaikan PO ini?')) {
         const form = document.getElementById('complete-form');
         form.action = `{{ url('purchasing/pos') }}/${id}/complete`;

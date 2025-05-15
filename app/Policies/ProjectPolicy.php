@@ -15,6 +15,22 @@ class ProjectPolicy
         //
     }
 
+    /**
+     * Allow viewing any project
+     */
+    public function viewAny(User $user): bool
+    {
+        return true; // Allow all users to view projects list
+    }
+
+    /**
+     * Allow viewing the project
+     */
+    public function view(User $user, Project $project): bool
+    {
+        return true; // Allow all users to view project details
+    }
+
     public function update(User $user, Project $project): bool
     {
         return $user->id === $project->manager_id;

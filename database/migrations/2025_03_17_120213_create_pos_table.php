@@ -21,7 +21,7 @@ return new class extends Migration
             $table->date('order_date'); // Tanggal pembuatan PO
             $table->decimal('total_amount', 15, 2); // Total biaya pembelian
             $table->date('estimated_usage_date')->nullable(); // Estimasi tanggal penggunaan
-            $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending'); // Status PO
+            $table->enum('status', ['pending', 'completed'])->default('pending'); // Status PO
             $table->text('remarks')->nullable(); // Catatan tambahan
             $table->timestamps();
         });

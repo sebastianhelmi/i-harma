@@ -26,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Project::class, ProjectPolicy::class);
 
         // Define Project Manager gate
-        Gate::define('manage-projects', function ($user) {
-            return $user->role_id === 1; // Assuming 2 is Project Manager role ID
+        Gate::define('view-projects', function ($user) {
+            return in_array($user->role, ['purchasing', 'admin', 'project-manager']);
         });
 
         $spbDocumentsPath = Storage::disk('public')->path('spb-documents');

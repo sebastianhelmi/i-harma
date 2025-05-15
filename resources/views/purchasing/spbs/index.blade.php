@@ -18,17 +18,17 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     <!-- Search & Filter -->
@@ -37,11 +37,8 @@
             <form action="{{ route('purchasing.spbs.index') }}" method="GET" class="row g-3">
                 <div class="col-md-4">
                     <div class="input-group">
-                        <input type="text"
-                               name="search"
-                               class="form-control"
-                               placeholder="Cari No. SPB/Proyek/Pemohon..."
-                               value="{{ request('search') }}">
+                        <input type="text" name="search" class="form-control"
+                            placeholder="Cari No. SPB/Proyek/Pemohon..." value="{{ request('search') }}">
                         <button class="btn btn-outline-secondary" type="submit">
                             <i class="fas fa-search"></i>
                         </button>
@@ -50,16 +47,16 @@
                 <div class="col-md-3">
                     <select name="category_entry" class="form-select" onchange="this.form.submit()">
                         <option value="">Semua Kategori</option>
-                        <option value="site" @selected(request('category_entry') == 'site')>Site</option>
-                        <option value="workshop" @selected(request('category_entry') == 'workshop')>Workshop</option>
+                        <option value="site" @selected(request('category_entry')=='site' )>Site</option>
+                        <option value="workshop" @selected(request('category_entry')=='workshop' )>Workshop</option>
                     </select>
                 </div>
                 @if(request('search') || request('category_entry'))
-                    <div class="col-md-2">
-                        <a href="{{ route('purchasing.spbs.index') }}" class="btn btn-light">
-                            <i class="fas fa-times me-2"></i>Reset Filter
-                        </a>
-                    </div>
+                <div class="col-md-2">
+                    <a href="{{ route('purchasing.spbs.index') }}" class="btn btn-light">
+                        <i class="fas fa-times me-2"></i>Reset Filter
+                    </a>
+                </div>
                 @endif
             </form>
         </div>
@@ -84,61 +81,59 @@
                     </thead>
                     <tbody>
                         @forelse($spbs as $spb)
-                            <tr>
-                                <td>{{ $spb->spb_number }}</td>
-                                <td>{{ $spb->spb_date->format('d/m/Y') }}</td>
-                                <td>
-                                    <span class="text-truncate d-inline-block" style="max-width: 200px;"
-                                          title="{{ $spb->project->name }}">
-                                        {{ $spb->project->name }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="text-truncate d-inline-block" style="max-width: 150px;"
-                                          title="{{ $spb->task->name }}">
-                                        {{ $spb->task->name }}
-                                    </span>
-                                </td>
-                                <td>{{ $spb->requester->name }}</td>
-                                <td>
-                                    <span class="badge bg-info">
-                                        {{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $spb->getStatusBadgeClass() }}">
-                                        {{ ucfirst($spb->status) }}
-                                    </span>
-                                    <span class="badge bg-secondary">
-                                        PO: {{ ucfirst($spb->status_po) }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('purchasing.spbs.show', $spb) }}"
-                                           class="btn btn-sm btn-info"
-                                           title="Lihat Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        @if($spb->status === 'approved' && $spb->status_po === 'pending')
-                                            <a href="{{ route('purchasing.pos.create', $spb) }}"
-                                               class="btn btn-sm btn-primary"
-                                               title="Buat PO">
-                                                <i class="fas fa-plus"></i> Buat PO
-                                            </a>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>{{ $spb->spb_number }}</td>
+                            <td>{{ $spb->spb_date->format('d/m/Y') }}</td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 200px;"
+                                    title="{{ $spb->project->name }}">
+                                    {{ $spb->project->name }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="text-truncate d-inline-block" style="max-width: 150px;"
+                                    title="{{ $spb->task->name }}">
+                                    {{ $spb->task->name }}
+                                </span>
+                            </td>
+                            <td>{{ $spb->requester->name }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $spb->getStatusBadgeClass() }}">
+                                    {{ ucfirst($spb->status) }}
+                                </span>
+                                <span class="badge bg-secondary">
+                                    PO: {{ ucfirst($spb->status_po) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ route('purchasing.spbs.show', $spb) }}" class="btn btn-sm btn-info"
+                                        title="Lihat Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if($spb->status === 'approved' && $spb->status_po === 'pending')
+                                    <a href="{{ route('purchasing.pos.create', $spb) }}" class="btn btn-sm btn-primary"
+                                        title="Buat PO">
+                                        <i class="fas fa-plus"></i> Buat PO
+                                    </a>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    <div class="text-muted">
-                                        <i class="fas fa-inbox fa-2x mb-3"></i>
-                                        <p class="mb-0">Tidak ada SPB yang perlu diproses</p>
-                                    </div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="8" class="text-center py-4">
+                                <div class="text-muted">
+                                    <i class="fas fa-inbox fa-2x mb-3"></i>
+                                    <p class="mb-0">Tidak ada SPB yang perlu diproses</p>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -153,12 +148,14 @@
 
 @push('styles')
 <style>
-    .table > :not(caption) > * > * {
+    .table> :not(caption)>*>* {
         padding: 1rem 0.75rem;
     }
+
     .badge {
         padding: 0.5em 0.75em;
     }
+
     .text-truncate {
         overflow: hidden;
         text-overflow: ellipsis;

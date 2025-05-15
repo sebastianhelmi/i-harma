@@ -3,141 +3,182 @@
 @section('title', 'Buat Purchase Order')
 
 @section('content')
-<div class="container-fluid">
+<div class="container-fluid" x-data="poForm">
+    <!-- Header -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h1 class="h3 mb-1">Buat Purchase Order</h1>
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
                     <li class="breadcrumb-item"><a href="{{ route('purchasing.dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('purchasing.pos.index') }}">Purchase Orders</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('purchasing.spbs.index') }}">SPB</a></li>
                     <li class="breadcrumb-item active">Buat PO</li>
                 </ol>
             </nav>
         </div>
-        <a href="{{ route('purchasing.pos.index') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-2"></i>Kembali
-        </a>
     </div>
 
-    @if(session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            {{ session('error') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <!-- Warning if no items to order -->
+    @if(!$hasItemsToOrder)
+    <div class="alert alert-warning d-flex justify-content-between align-items-center">
+        <div>
+            <i class="fas fa-info-circle me-2"></i>
+            Semua item tersedia di inventory. Tidak perlu membuat PO.
         </div>
+        <form id="markNotRequiredForm" action="{{ route('purchasing.spbs.mark-not-required', $spb) }}" method="POST"
+            class="d-inline">
+            @csrf
+            @method('PATCH')
+            <button type="button" class="btn btn-success btn-sm" @click="confirmMarkNotRequired">
+                <i class="fas fa-check me-1"></i>
+                Tandai Tidak Perlu PO
+            </button>
+        </form>
+    </div>
     @endif
 
-    <form action="{{ route('purchasing.pos.store') }}" method="POST" x-data="poForm">
+    <!-- SPB Info -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Informasi SPB</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <td width="150">Nomor SPB</td>
+                            <td>: {{ $spb->spb_number }}</td>
+                        </tr>
+                        <tr>
+                            <td>Tanggal SPB</td>
+                            <td>: {{ $spb->spb_date->format('d/m/Y') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Proyek</td>
+                            <td>: {{ $spb->project->name }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <table class="table table-sm">
+                        <tr>
+                            <td width="150">Diminta Oleh</td>
+                            <td>: {{ $spb->requester->name }}</td>
+                        </tr>
+                        <tr>
+                            <td>Kategori</td>
+                            <td>: {{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}</td>
+                        </tr>
+                        <tr>
+                            <td>Kategori Item</td>
+                            <td>: {{ $spb->itemCategory->name }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PO Form -->
+    <form id="poForm" action="{{ route('purchasing.pos.store') }}" method="POST">
         @csrf
         <input type="hidden" name="spb_id" value="{{ $spb->id }}">
 
         <div class="row">
-            <div class="col-md-8">
-                <!-- SPB Info -->
-                <div class="card mb-4">
+            <!-- PO Details -->
+            <div class="col-md-12 mb-4">
+                <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Informasi SPB</h5>
+                        <h5 class="card-title mb-0">Detail Purchase Order</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <dl class="row mb-0">
-                                    <dt class="col-sm-4">No. SPB</dt>
-                                    <dd class="col-sm-8">{{ $spb->spb_number }}</dd>
-
-                                    <dt class="col-sm-4">Tanggal SPB</dt>
-                                    <dd class="col-sm-8">{{ $spb->spb_date->format('d/m/Y') }}</dd>
-
-                                    <dt class="col-sm-4">Proyek</dt>
-                                    <dd class="col-sm-8">{{ $spb->project->name }}</dd>
-                                </dl>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="supplier_id" class="form-label required">Supplier</label>
+                                <select class="form-select @error('supplier_id') is-invalid @enderror"
+                                    name="supplier_id" x-model="supplierId" required>
+                                    <option value="">Pilih Supplier</option>
+                                    @foreach($suppliers as $supplier)
+                                    <option value="{{ $supplier->id }}">{{ $supplier->name }}</option>
+                                    @endforeach
+                                </select>
+                                @error('supplier_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
-                            <div class="col-md-6">
-                                <dl class="row mb-0">
-                                    <dt class="col-sm-4">Task</dt>
-                                    <dd class="col-sm-8">{{ $spb->task->name }}</dd>
 
-                                    <dt class="col-sm-4">Diminta Oleh</dt>
-                                    <dd class="col-sm-8">{{ $spb->requester->name }}</dd>
+                            <div class="col-md-4">
+                                <label for="order_date" class="form-label required">Tanggal Order</label>
+                                <input type="date" class="form-control @error('order_date') is-invalid @enderror"
+                                    name="order_date" value="{{ old('order_date', date('Y-m-d')) }}" required>
+                                @error('order_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
 
-                                    <dt class="col-sm-4">Kategori</dt>
-                                    <dd class="col-sm-8">{{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}</dd>
-                                </dl>
+                            <div class="col-md-4">
+                                <label for="estimated_usage_date" class="form-label required">Perkiraan
+                                    Penggunaan</label>
+                                <input type="date"
+                                    class="form-control @error('estimated_usage_date') is-invalid @enderror"
+                                    name="estimated_usage_date" value="{{ old('estimated_usage_date') }}"
+                                    min="{{ date('Y-m-d', strtotime('+1 day')) }}" required>
+                                @error('estimated_usage_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-12">
+                                <label for="remarks" class="form-label">Catatan</label>
+                                <textarea class="form-control @error('remarks') is-invalid @enderror" name="remarks"
+                                    rows="2">{{ old('remarks') }}</textarea>
+                                @error('remarks')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Items Table -->
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Detail Item</h5>
+            <!-- Items Table -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Daftar Item</h5>
+                        <div class="badge-group">
+                            <span class="badge bg-success">Tersedia di Inventory</span>
+                            <span class="badge bg-warning">Stok Kurang</span>
+                            <span class="badge bg-danger">Tidak Tersedia</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table">
+                            <table class="table table-bordered align-middle">
                                 <thead>
                                     <tr>
                                         <th>Nama Item</th>
+                                        <th>Stok Inventory</th>
+                                        <th>Jumlah Diminta</th>
+                                        <th>Jumlah PO</th>
                                         <th>Satuan</th>
-                                        <th class="text-center">Jumlah</th>
-                                        <th>Harga Satuan</th>
+                                        <th>Harga Referensi</th>
+                                        <th>Harga PO</th>
                                         <th>Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @if($spb->category_entry === 'site')
-                                        @foreach($spb->siteItems as $item)
-                                            <tr>
-                                                <td>{{ $item->item_name }}</td>
-                                                <td>{{ $item->unit }}</td>
-                                                <td class="text-center">{{ $item->quantity }}</td>
-                                                <td>
-                                                    <input type="hidden"
-                                                           name="items[{{ $loop->index }}][id]"
-                                                           value="{{ $item->id }}">
-                                                    <input type="hidden"
-                                                           name="items[{{ $loop->index }}][type]"
-                                                           value="site">
-                                                    <input type="number"
-                                                           class="form-control"
-                                                           name="items[{{ $loop->index }}][unit_price]"
-                                                           x-model="items[{{ $loop->index }}].unitPrice"
-                                                           @input="calculateTotal"
-                                                           required>
-                                                </td>
-                                                <td x-text="formatCurrency(items[{{ $loop->index }}].total)"></td>
-                                            </tr>
-                                        @endforeach
+                                    @include('purchasing.pos._site_items_table')
                                     @else
-                                        @foreach($spb->workshopItems as $item)
-                                            <tr>
-                                                <td>{{ $item->explanation_items }}</td>
-                                                <td>{{ $item->unit }}</td>
-                                                <td class="text-center">{{ $item->quantity }}</td>
-                                                <td>
-                                                    <input type="hidden"
-                                                           name="items[{{ $loop->index }}][id]"
-                                                           value="{{ $item->id }}">
-                                                    <input type="hidden"
-                                                           name="items[{{ $loop->index }}][type]"
-                                                           value="workshop">
-                                                    <input type="number"
-                                                           class="form-control"
-                                                           name="items[{{ $loop->index }}][unit_price]"
-                                                           x-model="items[{{ $loop->index }}].unitPrice"
-                                                           @input="calculateTotal"
-                                                           required>
-                                                </td>
-                                                <td x-text="formatCurrency(items[{{ $loop->index }}].total)"></td>
-                                            </tr>
-                                        @endforeach
+                                    @include('purchasing.pos._workshop_items_table')
                                     @endif
                                 </tbody>
                                 <tfoot>
                                     <tr>
-                                        <td colspan="4" class="text-end fw-bold">Total:</td>
-                                        <td x-text="formatCurrency(total)" class="fw-bold"></td>
+                                        <th colspan="7" class="text-end">Total PO:</th>
+                                        <th class="text-end" x-text="formatPrice(total)"></th>
                                     </tr>
                                 </tfoot>
                             </table>
@@ -145,134 +186,188 @@
                     </div>
                 </div>
             </div>
+        </div>
 
-            <div class="col-md-4">
-                <!-- PO Details -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Detail PO</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="mb-3">
-                            <label class="form-label required">Supplier</label>
-                            <select name="supplier_id"
-                                    class="form-select @error('supplier_id') is-invalid @enderror"
-                                    x-model="supplierId"
-                                    @change="updateCompanyName"
-                                    required>
-                                <option value="">Pilih Supplier</option>
-                                @foreach($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}"
-                                            data-company="{{ $supplier->company_name }}">
-                                        {{ $supplier->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('supplier_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label required">Nama Perusahaan</label>
-                            <input type="text"
-                                   name="company_name"
-                                   class="form-control @error('company_name') is-invalid @enderror"
-                                   x-model="companyName"
-                                   required>
-                            @error('company_name')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label required">Tanggal Order</label>
-                            <input type="date"
-                                   name="order_date"
-                                   class="form-control @error('order_date') is-invalid @enderror"
-                                   value="{{ date('Y-m-d') }}"
-                                   required>
-                            @error('order_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label required">Estimasi Tanggal Penggunaan</label>
-                            <input type="date"
-                                   name="estimated_usage_date"
-                                   class="form-control @error('estimated_usage_date') is-invalid @enderror"
-                                   required>
-                            @error('estimated_usage_date')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label">Catatan</label>
-                            <textarea name="remarks"
-                                      class="form-control @error('remarks') is-invalid @enderror"
-                                      rows="3"></textarea>
-                            @error('remarks')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">
-                            <i class="fas fa-save me-2"></i>Buat Purchase Order
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <div class="d-flex justify-content-end gap-2 mt-4">
+            <a href="{{ route('purchasing.spbs.index') }}" class="btn btn-secondary">
+                <i class="fas fa-times me-1"></i>Batal
+            </a>
+            @if($hasItemsToOrder)
+            <button type="button" class="btn btn-primary" :disabled="!isValid" @click="confirmSubmit">
+                <i class="fas fa-save me-1"></i>Buat PO
+            </button>
+            @endif
         </div>
     </form>
 </div>
 @endsection
 
+@push('styles')
+<style>
+    .required:after {
+        content: " *";
+        color: red;
+    }
+
+    .badge-group .badge {
+        margin-left: 0.5rem;
+    }
+
+    .table> :not(caption)>*>* {
+        padding: 0.75rem;
+    }
+
+    .input-group-sm>.form-control {
+        padding: 0.25rem 0.5rem;
+    }
+</style>
+@endpush
+
 @push('scripts')
 <script>
-document.addEventListener('alpine:init', () => {
+    document.addEventListener('alpine:init', () => {
     Alpine.data('poForm', () => ({
         supplierId: '',
-        companyName: '',
-        items: [
+        items: {
             @if($spb->category_entry === 'site')
                 @foreach($spb->siteItems as $item)
-                    {
-                        quantity: {{ $item->quantity }},
-                        unitPrice: '',
-                        total: 0
-                    },
+                    @if(!$item->available)
+                        {{ $item->id }}: {
+                            quantity: {{ $item->needed_quantity }},
+                            unit_price: 0,
+                            reference_price: {{ $item->inventory_unit_price ?? 0 }},
+                            total: 0
+                        },
+                    @endif
                 @endforeach
             @else
                 @foreach($spb->workshopItems as $item)
-                    {
-                        quantity: {{ $item->quantity }},
-                        unitPrice: '',
-                        total: 0
-                    },
+                    @if(!$item->available)
+                        {{ $item->id }}: {
+                            quantity: {{ $item->needed_quantity }},
+                            unit_price: 0,
+                            reference_price: {{ $item->inventory_unit_price ?? 0 }},
+                            total: 0
+                        },
+                    @endif
                 @endforeach
             @endif
-        ],
+        },
         total: 0,
 
-        updateCompanyName() {
-            const option = this.$el.querySelector(`option[value="${this.supplierId}"]`);
-            this.companyName = option ? option.dataset.company : '';
-        },
-
         calculateTotal() {
-            this.items.forEach(item => {
-                item.total = item.quantity * (item.unitPrice || 0);
-            });
-            this.total = this.items.reduce((sum, item) => sum + item.total, 0);
+            this.total = 0;
+            for (let id in this.items) {
+                this.items[id].total = this.items[id].quantity * (parseFloat(this.items[id].unit_price) || 0);
+                this.total += this.items[id].total;
+            }
         },
 
-        formatCurrency(value) {
+        formatPrice(value) {
             return new Intl.NumberFormat('id-ID', {
                 style: 'currency',
                 currency: 'IDR'
-            }).format(value);
+            }).format(value || 0);
+        },
+
+        get isValid() {
+            return this.supplierId &&
+                this.total > 0 &&
+                Object.values(this.items).every(item => parseFloat(item.unit_price) > 0);
+        },
+
+        confirmMarkNotRequired() {
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Yakin ingin menandai SPB ini tidak memerlukan PO?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Tandai',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('markNotRequiredForm');
+                    const formData = new FormData(form);
+
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.icon,
+                            title: data.title,
+                            text: data.text
+                        }).then(() => {
+                            if (data.success && data.redirectTo) {
+                                window.location.href = data.redirectTo;
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat memproses permintaan.'
+                        });
+                    });
+                }
+            });
+        },
+        confirmSubmit() {
+            if (!this.isValid) return;
+
+            Swal.fire({
+                title: 'Konfirmasi',
+                text: 'Yakin ingin membuat PO ini?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#0d6efd',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Buat PO',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.getElementById('poForm');
+                    const formData = new FormData(form);
+
+                    // Submit with fetch
+                    fetch(form.action, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        Swal.fire({
+                            icon: data.icon,
+                            title: data.title,
+                            text: data.text
+                        }).then(() => {
+                            if (data.success && data.redirectTo) {
+                                window.location.href = data.redirectTo;
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Terjadi kesalahan saat memproses permintaan.'
+                        });
+                    });
+                }
+            });
         }
     }));
 });

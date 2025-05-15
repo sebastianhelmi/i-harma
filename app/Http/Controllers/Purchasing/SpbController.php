@@ -13,21 +13,21 @@ class SpbController extends Controller
         $query = Spb::with(['project', 'requester', 'task', 'itemCategory'])
             ->where('status', 'approved')
             ->where('status_po', 'pending')
-            ->when($request->search, function($q) use ($request) {
-                return $q->where(function($query) use ($request) {
+            ->when($request->search, function ($q) use ($request) {
+                return $q->where(function ($query) use ($request) {
                     $query->where('spb_number', 'like', "%{$request->search}%")
-                          ->orWhereHas('project', function($q) use ($request) {
-                              $q->where('name', 'like', "%{$request->search}%");
-                          })
-                          ->orWhereHas('requester', function($q) use ($request) {
-                              $q->where('name', 'like', "%{$request->search}%");
-                          });
+                        ->orWhereHas('project', function ($q) use ($request) {
+                            $q->where('name', 'like', "%{$request->search}%");
+                        })
+                        ->orWhereHas('requester', function ($q) use ($request) {
+                            $q->where('name', 'like', "%{$request->search}%");
+                        });
                 });
             })
-            ->when($request->project_id, function($q) use ($request) {
+            ->when($request->project_id, function ($q) use ($request) {
                 return $q->where('project_id', $request->project_id);
             })
-            ->when($request->category_entry, function($q) use ($request) {
+            ->when($request->category_entry, function ($q) use ($request) {
                 return $q->where('category_entry', $request->category_entry);
             })
             ->latest('spb_date');
@@ -39,11 +39,6 @@ class SpbController extends Controller
 
     public function show(Spb $spb)
     {
-        if ($spb->status !== 'approved' || $spb->status_po !== 'pending') {
-            return redirect()
-                ->route('purchasing.spbs.index')
-                ->with('error', 'SPB ini tidak dapat diproses untuk PO.');
-        }
 
         $spb->load([
             'project',

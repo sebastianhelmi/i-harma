@@ -1,29 +1,32 @@
 <?php
 
+use App\Http\Controllers\Inventory\InventoryController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:Inventory'])->group(function () {
-    Route::get('/inventory/dashboard', function () {
+Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('inventory.')->group(function () {
+    Route::get('/dashboard', function () {
         return view('inventory.dashboard');
-    })->name('inventory.dashboard');
+    })->name('dashboard');
 
-    Route::get('/inventory/items', function () {
-        return view('inventory.items.index');
-    })->name('inventory.items.index');
+    Route::get('/items', [InventoryController::class, 'index'])->name('items.index');
+    Route::get('/items/create', [InventoryController::class, 'create'])->name('items.create');
+    Route::post('/items', [InventoryController::class, 'store'])->name('items.store');
+    Route::get('/items/{item}/edit', [InventoryController::class, 'edit'])->name('items.edit');
+    Route::put('/items/{item}', [InventoryController::class, 'update'])->name('items.update');
 
-    Route::get('/inventory/incoming', function () {
+    Route::get('/incoming', function () {
         return view('inventory.incoming');
-    })->name('inventory.incoming');
+    })->name('incoming');
 
-    Route::get('/inventory/outgoing', function () {
+    Route::get('/outgoing', function () {
         return view('inventory.outgoing');
-    })->name('inventory.outgoing');
+    })->name('outgoing');
 
-    Route::get('/inventory/reports', function () {
+    Route::get('/reports', function () {
         return view('inventory.reports');
-    })->name('inventory.reports');
+    })->name('reports');
 
-    Route::get('/inventory/settings', function () {
+    Route::get('/settings', function () {
         return view('inventory.settings');
-    })->name('inventory.settings');
+    })->name('settings');
 });

@@ -47,7 +47,7 @@ class TaskController extends Controller
         $projects = Project::where('manager_id', Auth::id())
             ->pluck('name', 'id');
 
-        $divisionHeads = User::whereHas('role', function($q) {
+        $divisionHeads = User::whereHas('role', function ($q) {
             $q->where('name', 'Kepala Divisi');
         })->pluck('name', 'id');
 
@@ -133,7 +133,7 @@ class TaskController extends Controller
         $projects = Project::where('manager_id', Auth::id())
             ->pluck('name', 'id');
 
-        $divisionHeads = User::whereHas('role', function($q) {
+        $divisionHeads = User::whereHas('role', function ($q) {
             $q->where('name', 'Kepala Divisi');
         })->pluck('name', 'id');
 

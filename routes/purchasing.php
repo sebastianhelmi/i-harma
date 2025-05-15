@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Purchasing\PoController;
 use App\Http\Controllers\Purchasing\SpbController;
+use App\Http\Controllers\Purchasing\SupplierController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Purchasing'])->prefix('purchasing')->name('purchasing.')->group(function () {
@@ -18,9 +19,7 @@ Route::middleware(['auth', 'role:Purchasing'])->prefix('purchasing')->name('purc
     Route::get('orders', function () {
         return view('purchasing.orders.index');
     })->name('orders.index');
-    Route::get('suppliers', function () {
-        return view('purchasing.suppliers.index');
-    })->name('suppliers.index');
+    Route::resource('suppliers', SupplierController::class);
     Route::get('reports', function () {
         return view('purchasing.reports');
     })->name('reports');

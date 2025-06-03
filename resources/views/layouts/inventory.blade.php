@@ -36,8 +36,8 @@
                     <span>Inventory Items</span>
                 </a>
 
-                <a href="{{ route('inventory.incoming') }}"
-                    class="nav-item {{ request()->routeIs('inventory.incoming') ? 'active' : '' }}">
+                <a href="{{ route('inventory.received-goods.index') }}"
+                    class="nav-item {{ request()->routeIs('inventory.received-goods') ? 'active' : '' }}">
                     <i class="icon" data-lucide="download"></i>
                     <span>Incoming</span>
                 </a>

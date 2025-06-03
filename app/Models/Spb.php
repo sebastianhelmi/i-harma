@@ -31,6 +31,12 @@ class Spb extends Model
         return $this->belongsTo(Project::class);
     }
 
+    public function po()
+    {
+        return $this->hasOne(Po::class);
+    }
+
+
     public function requester()
     {
         return $this->belongsTo(User::class, 'requested_by');

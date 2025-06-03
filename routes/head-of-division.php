@@ -17,6 +17,8 @@ Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->n
     Route::resource('tasks', TaskController::class);
     Route::get('/spbs/create/{task?}', [SpbController::class, 'create'])->name('spbs.create');
     Route::resource('spbs', SpbController::class)->except(['create']);
+    Route::get('/spbs/{spb}/items', [SpbController::class, 'getItems'])->name('spbs.items');
+    Route::patch('/spbs/{spb}/take-items', [SpbController::class, 'takeItems'])->name('spbs.take-items');
 
 });
 

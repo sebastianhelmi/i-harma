@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\Gate;
 
 class TaskController extends Controller
 {
-    public function __construct()
-    {
-        Gate::authorize('manage-projects');
-    }
+    // public function __construct()
+    // {
+    //     Gate::authorize('manage-projects');
+    // }
 
     public function index(Request $request)
     {

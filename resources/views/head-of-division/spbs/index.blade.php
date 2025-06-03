@@ -124,11 +124,22 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('head-of-division.spbs.show', $spb) }}"
-                                       class="btn btn-sm btn-info"
-                                       title="Lihat Detail">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
+                                    <div class="btn-group">
+                                        <a href="{{ route('head-of-division.spbs.show', $spb) }}"
+                                           class="btn btn-sm btn-info"
+                                           title="Detail">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+
+                                        @if($spb->can_take_items)
+                                            <button type="button"
+                                                    class="btn btn-sm btn-success"
+                                                    title="Ambil Barang"
+                                                    onclick="confirmTakeItems('{{ $spb->id }}', '{{ $spb->spb_number }}')">
+                                                <i class="fas fa-hand-holding"></i>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -149,6 +160,7 @@
     </div>
 </div>
 
+
 @push('styles')
 <style>
     .badge {
@@ -160,3 +172,93 @@
 </style>
 @endpush
 @endsection
+
+<!-- Add this modal before the @push('scripts') -->
+<div class="modal fade" id="takeItemsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Konfirmasi Pengambilan Barang</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Anda akan mengambil barang untuk SPB <strong id="spbNumber"></strong></p>
+
+                <div class="table-responsive mt-3">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nama Barang</th>
+                                <th>Jumlah</th>
+                                <th>Satuan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsList"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-success" id="confirmTakeBtn">
+                    <i class="fas fa-check me-1"></i>Ambil Barang
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@push('scripts')
+<script>
+let takeItemsModal;
+
+document.addEventListener('DOMContentLoaded', function() {
+    takeItemsModal = new bootstrap.Modal(document.getElementById('takeItemsModal'));
+});
+
+async function confirmTakeItems(spbId, spbNumber) {
+    try {
+        // Fetch items data
+        const response = await fetch(`{{ url('head-of-division/spbs') }}/${spbId}/items`);
+        const data = await response.json();
+
+        if (!data.success) {
+            throw new Error(data.message);
+        }
+
+        // Update modal content
+        document.getElementById('spbNumber').textContent = spbNumber;
+
+        const itemsList = document.getElementById('itemsList');
+        itemsList.innerHTML = data.items.map(item => `
+            <tr>
+                <td>${item.name}</td>
+                <td>${item.quantity}</td>
+                <td>${item.unit}</td>
+            </tr>
+        `).join('');
+
+        // Setup confirm button
+        document.getElementById('confirmTakeBtn').onclick = () => submitTakeItems(spbId);
+
+        // Show modal
+        takeItemsModal.show();
+
+    } catch (error) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message
+        });
+    }
+}
+
+function submitTakeItems(spbId) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = `{{ url('head-of-division/spbs') }}/${spbId}/take-items`;
+    form.innerHTML = `@csrf @method('PATCH')`;
+    document.body.appendChild(form);
+    form.submit();
+}
+</script>
+@endpush

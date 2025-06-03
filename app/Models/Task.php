@@ -83,4 +83,9 @@ class Task extends Model
         };
     }
 
+    public function spb()
+{
+    return $this->hasOne(Spb::class);
+}
+
 }

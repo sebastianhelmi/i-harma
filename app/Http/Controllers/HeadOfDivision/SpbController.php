@@ -3,19 +3,22 @@
 namespace App\Http\Controllers\HeadOfDivision;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inventory;
+use App\Models\InventoryTransaction;
 use App\Models\Spb;
 use App\Models\Project;
 use App\Models\Task;
 use App\Models\ItemCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class SpbController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Spb::with(['project', 'task', 'itemCategory'])
+        $query = Spb::with(['project', 'task', 'itemCategory', 'po'])
             ->where('requested_by', Auth::id());
 
         // Apply search filter
@@ -44,6 +47,13 @@ class SpbController extends Controller
         })->pluck('name', 'id');
 
         $spbs = $query->latest()->paginate(10);
+
+        // Check which SPBs have items ready to take
+        foreach ($spbs as $spb) {
+            $spb->can_take_items = $spb->status === 'approved' &&
+                $spb->po &&
+                $spb->po->status === 'completed';
+        }
 
         return view('head-of-division.spbs.index', compact('spbs', 'projects'));
     }
@@ -187,9 +197,141 @@ class SpbController extends Controller
             'requester',
             'approver',
             'siteItems',
-            'workshopItems'
+            'workshopItems',
+            'po.items', // Load PO items if exists
         ]);
 
-        return view('head-of-division.spbs.show', compact('spb'));
+        // Check if items can be taken
+        $canTakeItems = $spb->status === 'approved' &&
+                        $spb->po &&
+                        $spb->po->status === 'completed';
+
+        // Get inventory transactions to check collected items through PO
+        $collectedItems = InventoryTransaction::whereHas('po', function($query) use ($spb) {
+                $query->where('spb_id', $spb->id);
+            })
+            ->where('transaction_type', 'OUT')
+            ->get()
+            ->groupBy('inventory_id');
+
+        return view('head-of-division.spbs.show', compact('spb', 'canTakeItems', 'collectedItems'));
+    }
+    public function takeItems(Spb $spb)
+    {
+        try {
+            // Verify ownership
+            if ($spb->requested_by !== Auth::id()) {
+                return back()->with('error', 'Anda tidak memiliki akses ke SPB ini.');
+            }
+
+            // Verify SPB status and load PO
+            if ($spb->status !== 'approved' || !$spb->po || $spb->po->status !== 'completed') {
+                return back()->with('error', 'SPB ini belum siap untuk pengambilan barang.');
+            }
+
+            DB::beginTransaction();
+
+            // Create transaction records for each item
+            if ($spb->category_entry === 'site') {
+                foreach ($spb->siteItems as $item) {
+                    $inventory = Inventory::where('item_name', $item->item_name)
+                        ->where('unit', $item->unit)
+                        ->first();
+
+                    if (!$inventory || $inventory->quantity < $item->quantity) {
+                        throw new \Exception("Stok {$item->item_name} tidak mencukupi.");
+                    }
+
+                    // Decrease inventory
+                    $inventory->decrement('quantity', $item->quantity);
+
+                    // Record transaction with po_id
+                    InventoryTransaction::create([
+                        'inventory_id' => $inventory->id,
+                        'po_id' => $spb->po->id, // Add PO ID here
+                        'quantity' => $item->quantity,
+                        'transaction_type' => 'OUT',
+                        'transaction_date' => now(),
+                        'handled_by' => Auth::id(),
+                        'remarks' => "Pengambilan barang SPB #{$spb->spb_number}"
+                    ]);
+                }
+            } else {
+                foreach ($spb->workshopItems as $item) {
+                    $inventory = Inventory::where('item_name', $item->explanation_items)
+                        ->where('unit', $item->unit)
+                        ->first();
+
+                    if (!$inventory || $inventory->quantity < $item->quantity) {
+                        throw new \Exception("Stok {$item->explanation_items} tidak mencukupi.");
+                    }
+
+                    // Decrease inventory
+                    $inventory->decrement('quantity', $item->quantity);
+
+                    // Record transaction with po_id
+                    InventoryTransaction::create([
+                        'inventory_id' => $inventory->id,
+                        'po_id' => $spb->po->id, // Add PO ID here
+                        'quantity' => $item->quantity,
+                        'transaction_type' => 'OUT',
+                        'transaction_date' => now(),
+                        'handled_by' => Auth::id(),
+                        'remarks' => "Pengambilan barang SPB #{$spb->spb_number}"
+                    ]);
+                }
+            }
+
+            // Update SPB status
+            $spb->update(['status' => 'completed']);
+
+            DB::commit();
+
+            return back()->with('success', 'Pengambilan barang berhasil dicatat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    public function getItems(Spb $spb)
+    {
+        try {
+            if ($spb->requested_by !== Auth::id()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unauthorized'
+                ], 403);
+            }
+
+            $items = [];
+            if ($spb->category_entry === 'site') {
+                $items = $spb->siteItems->map(function ($item) {
+                    return [
+                        'name' => $item->item_name,
+                        'quantity' => $item->quantity,
+                        'unit' => $item->unit
+                    ];
+                });
+            } else {
+                $items = $spb->workshopItems->map(function ($item) {
+                    return [
+                        'name' => $item->explanation_items,
+                        'quantity' => $item->quantity,
+                        'unit' => $item->unit
+                    ];
+                });
+            }
+
+            return response()->json([
+                'success' => true,
+                'items' => $items
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

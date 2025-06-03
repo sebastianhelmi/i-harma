@@ -52,9 +52,9 @@ class TaskController extends Controller
     }
 
 
-    public function show($id)
+      public function show($id)
     {
-        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo'])
+        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo', 'spb'])
             ->findOrFail($id);
 
         // Check if task is assigned to current user
@@ -64,12 +64,16 @@ class TaskController extends Controller
                 ->with('error', 'Anda tidak memiliki akses ke tugas ini.');
         }
 
-        // Check if SPB can be created
-        $canCreateSpb = $task->project_id && $task->status !== 'completed';
+        // Check if SPB can be created:
+        // - Task has project
+        // - Task is not completed
+        // - No existing SPB for this task
+        $canCreateSpb = $task->project_id &&
+                        $task->status !== 'completed' &&
+                        !$task->spb()->exists();
 
         return view('head-of-division.tasks.show', compact('task', 'canCreateSpb'));
     }
-
     public function create()
     {
         $task = Task::with(['project', 'subtasks'])

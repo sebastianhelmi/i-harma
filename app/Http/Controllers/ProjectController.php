@@ -10,11 +10,11 @@ use Illuminate\Support\Facades\Gate;
 
 class ProjectController extends Controller
 {
-    public function __construct()
-    {
-        // Use Gate::authorize to check role
-        Gate::authorize('manage-projects');
-    }
+    // public function __construct()
+    // {
+    //     // Use Gate::authorize to check role
+    //     Gate::authorize('manage-projects');
+    // }
 
     public function index()
     {

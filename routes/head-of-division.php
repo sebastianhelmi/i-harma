@@ -13,6 +13,7 @@ Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->n
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
     Route::get('/tasks/{task}', [TaskController::class, 'show'])->name('tasks.show');
+    Route::patch('/tasks/{id}/complete', [TaskController::class, 'complete'])->name('tasks.complete');
 
     Route::resource('tasks', TaskController::class);
     Route::get('/spbs/create/{task?}', [SpbController::class, 'create'])->name('spbs.create');

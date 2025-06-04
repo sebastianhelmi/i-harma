@@ -88,4 +88,9 @@ class Task extends Model
     return $this->hasOne(Spb::class);
 }
 
+public function workshopOutputs()
+{
+    return $this->hasMany(WorkshopOutput::class);
+}
+
 }

@@ -3,6 +3,17 @@
 @section('title', 'Detail Tugas')
 
 @section('content')
+    @push('styles')
+        <style>
+            .table th {
+                background-color: #f8fafc;
+            }
+
+            .badge {
+                font-size: 0.85em;
+            }
+        </style>
+    @endpush
     <div class="container-fluid">
         <!-- Header Section -->
         <div class="d-flex justify-content-between align-items-center mb-4">
@@ -71,65 +82,131 @@
                                 } }}
                             </span>
                         </div>
-
-                        @if ($canCreateSpb)
-                            <a href="{{ route('head-of-division.spbs.create', ['task' => $task]) }}"
-                                class="btn btn-primary w-100">
-                                <i class="fas fa-file-alt me-2"></i>Ajukan SPB
-                            </a>
-                        @elseif($task->spb)
-                            <div class="alert alert-info mb-0">
-                                <i class="fas fa-info-circle me-2"></i>
-                                SPB sudah dibuat dengan nomor:
-                                <strong>{{ $task->spb->spb_number }}</strong>
-                            </div>
-                        @endif
+                        <div class="d-grid gap-2">
+                            @if ($task->status !== 'completed')
+                                @if ($task->spb && $task->spb->category_entry === 'workshop')
+                                    <button type="button" class="btn btn-success" onclick="showCompleteWorkshopModal()">
+                                        <i class="fas fa-check-circle me-2"></i>Selesaikan Tugas Workshop
+                                    </button>
+                                @else
+                                    <button type="button" class="btn btn-success"
+                                        onclick="confirmComplete('{{ $task->id }}')">
+                                        <i class="fas fa-check-circle me-2"></i>Selesaikan Tugas
+                                    </button>
+                                @endif
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Subtasks Section -->
-    @if ($task->subtasks->isNotEmpty())
-        <div class="card">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Sub Tugas</h5>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
-                            <tr>
-                                <th>Nama Sub Tugas</th>
-                                <th>Deadline</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($task->subtasks as $subtask)
-                                <tr>
-                                    <td>{{ $subtask->name }}</td>
-                                    <td>{{ $subtask->due_date }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ $subtask->getStatusBadgeClass() }}">
-                                            <i class="fas {{ $subtask->getStatusIcon() }} me-1"></i>
-                                            {{ match ($subtask->status) {
-                                                'pending' => 'Pending',
-                                                'in_progress' => 'Sedang Dikerjakan',
-                                                'completed' => 'Selesai',
-                                            } }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+        @if ($task->spb && $task->spb->category_entry === 'workshop')
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Output Workshop</h5>
+                </div>
+                <div class="card-body">
+                    @if ($task->workshopOutputs->isNotEmpty())
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th>Jumlah</th>
+                                        <th>Status</th>
+                                        <th>Pengiriman</th>
+                                        <th>Catatan</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($task->workshopOutputs as $output)
+                                        <tr>
+                                            <td>{{ $output->workshopSpb->explanation_items }}</td>
+                                            <td>{{ $output->quantity_produced }} {{ $output->workshopSpb->unit }}</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-{{ $output->status === 'completed' ? 'success' : 'warning' }}">
+                                                    {{ $output->status === 'completed' ? 'Selesai' : 'Pending' }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                @if ($output->need_delivery)
+                                                    <span class="badge bg-info">
+                                                        <i class="fas fa-truck me-1"></i>Perlu Dikirim
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-secondary">
+                                                        <i class="fas fa-warehouse me-1"></i>Simpan di Gudang
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td>{{ $output->notes ?? '-' }}</td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        @if ($task->status !== 'completed')
+                            <div class="alert alert-warning mb-0">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Output workshop belum dicatat. Klik tombol "Selesaikan & Catat Output" untuk mencatat
+                                output.
+                            </div>
+                        @else
+                            <div class="alert alert-info mb-0">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Tidak ada output yang dicatat untuk tugas ini.
+                            </div>
+                        @endif
+                    @endif
                 </div>
             </div>
-        </div>
-    @endif
+
+        @endif
+        <!-- Subtasks Section -->
+        @if ($task->subtasks->isNotEmpty())
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Sub Tugas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nama Sub Tugas</th>
+                                    <th>Deadline</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($task->subtasks as $subtask)
+                                    <tr>
+                                        <td>{{ $subtask->name }}</td>
+                                        <td>{{ $subtask->due_date }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $subtask->getStatusBadgeClass() }}">
+                                                <i class="fas {{ $subtask->getStatusIcon() }} me-1"></i>
+                                                {{ match ($subtask->status) {
+                                                    'pending' => 'Pending',
+                                                    'in_progress' => 'Sedang Dikerjakan',
+                                                    'completed' => 'Selesai',
+                                                } }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
+
+
 
     @push('styles')
         <style>
@@ -156,4 +233,92 @@
             }
         </style>
     @endpush
+
+
+    @if ($task->spb && $task->spb->category_entry === 'workshop')
+        @include('head-of-division.tasks._complete_workshop_task_modal')
+    @endif
 @endsection
+
+@push('scripts')
+    <script>
+        function confirmComplete(taskId) {
+            Swal.fire({
+                title: 'Selesaikan Tugas?',
+                text: "Pastikan semua sub-tugas dan SPB sudah selesai",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `{{ url('head-of-division/tasks') }}/${taskId}/complete`;
+                    form.innerHTML = `@csrf @method('PATCH')`;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        }
+
+        function showWorkshopOutputModal() {
+            const modal = new bootstrap.Modal(document.getElementById('workshopOutputModal'));
+            modal.show();
+        }
+        function showCompleteWorkshopModal() {
+    const modal = new bootstrap.Modal(document.getElementById('completeWorkshopTaskModal'));
+    modal.show();
+}
+        // Add form validation
+        document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('completeWorkshopTaskForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Validate quantities
+            const quantities = form.querySelectorAll('input[name$="[quantity_produced]"]');
+            let isValid = true;
+
+            quantities.forEach(input => {
+                if (parseInt(input.value) < 1) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                } else {
+                    input.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Validasi Gagal',
+                    text: 'Pastikan semua jumlah produksi valid'
+                });
+                return;
+            }
+
+            // Confirm submission
+            Swal.fire({
+                title: 'Selesaikan Tugas?',
+                text: 'Pastikan semua data produksi sudah benar',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Ya, Selesaikan',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        });
+    }
+});
+    </script>
+@endpush

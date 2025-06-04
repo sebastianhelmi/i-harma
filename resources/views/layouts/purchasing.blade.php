@@ -127,6 +127,27 @@
         lucide.createIcons();
     </script>
     @stack('scripts')
+    @if (session('success'))
+        <script type="module">
+            Swal.fire({
+                icon: 'success',
+                title: 'Berhasil',
+                text: "{{ session('success') }}",
+                showConfirmButton: false,
+                timer: 2000
+            });
+        </script>
+    @endif
+
+    @if (session('error'))
+        <script type="module">
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: "{{ session('error') }}"
+            });
+        </script>
+    @endif
 </body>
 
 </html>

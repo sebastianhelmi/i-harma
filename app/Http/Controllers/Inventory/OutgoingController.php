@@ -13,27 +13,46 @@ class OutgoingController extends Controller
 {
     public function index(Request $request)
     {
+        // Get all inventory items for the filter dropdown
+        $inventoryItems = Inventory::select('id', 'item_name as name')
+            ->orderBy('item_name')
+            ->get();
+
         $query = InventoryTransaction::with(['inventory', 'handler'])
             ->where('transaction_type', 'out');
 
-        // Filter by date
-        if ($request->has('date')) {
-            $query->whereDate('transaction_date', $request->date);
+        // Filter by date range
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('transaction_date', [
+                $request->start_date,
+                $request->end_date
+            ]);
         }
 
-        // Search by item name
-        if ($request->has('search')) {
-            $search = $request->search;
-            $query->whereHas('inventory', function ($q) use ($search) {
-                $q->where('item_name', 'like', "%{$search}%");
+        // Filter by inventory item
+        if ($request->filled('inventory_id')) {
+            $query->where('inventory_id', $request->inventory_id);
+        }
+
+        // Filter by PO number
+        if ($request->filled('po_number')) {
+            $query->whereHas('po', function ($q) use ($request) {
+                $q->where('po_number', 'like', "%{$request->po_number}%");
             });
         }
 
+        // Get total outgoing quantity
+        $totalOutgoing = $query->sum('quantity') * -1;
+
+        // Get paginated results
         $transactions = $query->latest()->paginate(10);
 
-        return view('inventory.outgoing.index', compact('transactions'));
+        return view('inventory.outgoing.index', compact(
+            'transactions',
+            'inventoryItems',
+            'totalOutgoing'
+        ));
     }
-
     public function create()
     {
         $inventories = Inventory::where('quantity', '>', 0)->get();

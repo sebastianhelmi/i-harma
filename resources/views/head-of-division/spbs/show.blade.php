@@ -18,12 +18,16 @@
         </div>
 
         <div class="d-flex gap-2">
-            @if($canTakeItems)
-                <button type="button"
-                        class="btn btn-success"
-                        onclick="confirmTakeItems('{{ $spb->id }}', '{{ $spb->spb_number }}')">
-                    <i class="fas fa-hand-holding me-2"></i>Ambil Barang
-                </button>
+            @if($spb->category_entry === 'workshop' && $canTakeItems)
+            <button type="button" class="btn btn-success"
+                onclick="confirmTakeItems('{{ $spb->id }}', '{{ $spb->spb_number }}')">
+                <i class="fas fa-hand-holding me-2"></i>Ambil Barang
+            </button>
+            @elseif($spb->category_entry === 'site' && $spb->status === 'approved')
+            <div class="alert alert-info mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                Barang site akan dikirim sesuai rencana pengiriman
+            </div>
             @endif
             <a href="{{ route('head-of-division.spbs.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Kembali
@@ -39,10 +43,10 @@
                     <h6 class="card-subtitle mb-2 text-muted">Status SPB</h6>
                     <span class="badge bg-{{ $spb->getStatusBadgeClass() }} fs-6">
                         {{ match($spb->status) {
-                            'pending' => 'Pending',
-                            'approved' => 'Disetujui',
-                            'rejected' => 'Ditolak',
-                            'completed' => 'Selesai',
+                        'pending' => 'Pending',
+                        'approved' => 'Disetujui',
+                        'rejected' => 'Ditolak',
+                        'completed' => 'Selesai',
                         } }}
                     </span>
                 </div>
@@ -53,7 +57,8 @@
                 <div class="card-body">
                     <h6 class="card-subtitle mb-2 text-muted">Status PO</h6>
                     <span class="badge bg-{{ $spb->po?->status === 'completed' ? 'success' : 'warning' }} fs-6">
-                        {{ $spb->po ? ($spb->po->status === 'completed' ? 'PO Selesai' : 'PO Dalam Proses') : 'Belum Ada PO' }}
+                        {{ $spb->po ? ($spb->po->status === 'completed' ? 'PO Selesai' : 'PO Dalam Proses') : 'Belum Ada
+                        PO' }}
                     </span>
                 </div>
             </div>
@@ -62,9 +67,17 @@
             <div class="card">
                 <div class="card-body">
                     <h6 class="card-subtitle mb-2 text-muted">Status Barang</h6>
+                    @if($spb->category_entry === 'site')
+                    @if($spb->status === 'completed')
+                    <span class="badge bg-success fs-6">Sudah Dikirim</span>
+                    @else
+                    <span class="badge bg-info fs-6">Menunggu Pengiriman</span>
+                    @endif
+                    @else
                     <span class="badge bg-{{ $spb->status === 'completed' ? 'success' : 'warning' }} fs-6">
                         {{ $spb->status === 'completed' ? 'Sudah Diambil' : 'Belum Diambil' }}
                     </span>
+                    @endif
                 </div>
             </div>
         </div>
@@ -91,45 +104,54 @@
                             </thead>
                             <tbody>
                                 @if($spb->category_entry === 'site')
-                                    @foreach($spb->siteItems as $item)
-                                    <tr>
-                                        <td>{{ $item->item_name }}</td>
-                                        <td>{{ $item->quantity }}</td>
-                                        <td>{{ $item->unit }}</td>
-                                        <td>
-                                            @php
-                                                $inventory = App\Models\Inventory::where('item_name', $item->item_name)
-                                                    ->where('unit', $item->unit)
-                                                    ->first();
-                                                $collected = $collectedItems[$inventory->id ?? 0] ?? collect();
-                                                $isCollected = $collected->sum('quantity') >= $item->quantity;
-                                            @endphp
-                                            <span class="badge bg-{{ $isCollected ? 'success' : 'warning' }}">
-                                                {{ $isCollected ? 'Sudah Diambil' : 'Belum Diambil' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                                @foreach($spb->siteItems as $item)
+                                <tr>
+                                    <td>{{ $item->item_name }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td>
+                                        @switch($inventoryStatus[$item->id]['status'])
+                                        @case('waiting_delivery')
+                                        <span class="badge bg-info">
+                                            <i class="fas fa-clock me-1"></i>
+                                            Menunggu Rencana Pengiriman
+                                        </span>
+                                        @break
+                                        @case('insufficient_stock')
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Stok Tidak Mencukupi
+                                        </span>
+                                        @break
+                                        @default
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-times me-1"></i>
+                                            Barang Tidak Tersedia
+                                        </span>
+                                        @endswitch
+                                    </td>
+                                </tr>
+                                @endforeach
                                 @else
-                                    @foreach($spb->workshopItems as $item)
-                                    <tr>
-                                        <td>{{ $item->explanation_items }}</td>
-                                        <td>{{ $item->quantity }}</td>
-                                        <td>{{ $item->unit }}</td>
-                                        <td>
-                                            @php
-                                                $inventory = App\Models\Inventory::where('item_name', $item->explanation_items)
-                                                    ->where('unit', $item->unit)
-                                                    ->first();
-                                                $collected = $collectedItems[$inventory->id ?? 0] ?? collect();
-                                                $isCollected = $collected->sum('quantity') >= $item->quantity;
-                                            @endphp
-                                            <span class="badge bg-{{ $isCollected ? 'success' : 'warning' }}">
-                                                {{ $isCollected ? 'Sudah Diambil' : 'Belum Diambil' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    @endforeach
+                                @foreach($spb->workshopItems as $item)
+                                <tr>
+                                    <td>{{ $item->explanation_items }}</td>
+                                    <td>{{ $item->quantity }}</td>
+                                    <td>{{ $item->unit }}</td>
+                                    <td>
+                                        @php
+                                        $inventory = App\Models\Inventory::where('item_name', $item->explanation_items)
+                                        ->where('unit', $item->unit)
+                                        ->first();
+                                        $collected = $collectedItems[$inventory->id ?? 0] ?? collect();
+                                        $isCollected = $collected->sum('quantity') >= $item->quantity;
+                                        @endphp
+                                        <span class="badge bg-{{ $isCollected ? 'success' : 'warning' }}">
+                                            {{ $isCollected ? 'Sudah Diambil' : 'Belum Diambil' }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                @endforeach
                                 @endif
                             </tbody>
                         </table>
@@ -194,7 +216,7 @@
 
 @push('scripts')
 <script>
-// ...existing scripts for take items modal...
+    // ...existing scripts for take items modal...
 </script>
 @endpush
 @endsection

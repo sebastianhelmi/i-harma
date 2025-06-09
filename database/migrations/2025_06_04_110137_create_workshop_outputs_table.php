@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('workshop_outputs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
-        $table->foreignId('spb_id')->constrained('spbs')->onDelete('cascade');
-        $table->foreignId('workshop_spb_id')->nullable()->constrained('workshop_spbs')->onDelete('set null'); // Make nullable
-        $table->foreignId('inventory_id')->nullable()->constrained('inventories')->onDelete('set null');
-        $table->integer('quantity_produced');
-        $table->enum('status', ['pending', 'completed'])->default('pending');
-        $table->text('notes')->nullable();
-        $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
-        $table->timestamp('completed_at')->nullable();
+            $table->foreignId('spb_id')->constrained('spbs')->onDelete('cascade');
+            $table->foreignId('workshop_spb_id')->nullable()->constrained('workshop_spbs')->onDelete('set null'); // Make nullable
+            $table->foreignId('inventory_id')->nullable()->constrained('inventories')->onDelete('set null');
+            $table->integer('quantity_produced');
+            $table->enum('status', ['pending', 'completed'])->default('pending');
+            $table->text('notes')->nullable();
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
+            $table->timestamp('completed_at')->nullable();
+            $table->foreignId('delivery_plan_id')->nullable()->constrained('delivery_plans')->onDelete('set null');
             $table->timestamps();
         });
     }

@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('packings', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('delivery_plan_id')->constrained('delivery_plans')->onDelete('cascade'); // Relasi ke rencana delivery
-            $table->enum('packing_type', ['box', 'bundle', 'loose']); // Jenis packing
-            $table->string('packing_category'); // Kategori packing
-            $table->string('packing_dimensions'); // Dimensi packing (misal: 100x50x30 cm)
-            $table->string('packing_number'); // Nomor packing unik
+            $table->foreignId('delivery_plan_id')->constrained('delivery_plans')->onDelete('cascade');
+            $table->enum('packing_type', ['box', 'bundle', 'loose', 'pallet', 'crate', 'barrel', 'bag']); // Updated enum values
+            $table->string('packing_category');
+            $table->string('packing_dimensions');
+            $table->string('packing_number');
             $table->timestamps();
         });
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Inventory\InventoryController;
+use App\Http\Controllers\Inventory\OutgoingController;
 use App\Http\Controllers\Inventory\ReceivedGoodsController;
 use Illuminate\Support\Facades\Route;
 
@@ -17,19 +18,15 @@ Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('invent
 
     Route::resource('received-goods', ReceivedGoodsController::class)->only(['index', 'create', 'store']);
 
-// With these specific routes
-Route::get('received-goods', [ReceivedGoodsController::class, 'index'])->name('received-goods.index');
-Route::get('received-goods/create/{po}', [ReceivedGoodsController::class, 'create'])->name('received-goods.create');
-Route::post('received-goods/store-item', [ReceivedGoodsController::class, 'storeItem'])->name('received-goods.store-item');
-Route::post('received-goods/{po}', [ReceivedGoodsController::class, 'store'])->name('received-goods.store');
+    // With these specific routes
+    Route::get('received-goods', [ReceivedGoodsController::class, 'index'])->name('received-goods.index');
+    Route::get('received-goods/create/{po}', [ReceivedGoodsController::class, 'create'])->name('received-goods.create');
+    Route::post('received-goods/store-item', [ReceivedGoodsController::class, 'storeItem'])->name('received-goods.store-item');
+    Route::post('received-goods/{po}', [ReceivedGoodsController::class, 'store'])->name('received-goods.store');
 
-    Route::get('/incoming', function () {
-        return view('inventory.incoming');
-    })->name('incoming');
-
-    Route::get('/outgoing', function () {
-        return view('inventory.outgoing');
-    })->name('outgoing');
+    Route::get('/outgoing', [OutgoingController::class, 'index'])->name('outgoing.index');
+    Route::get('/outgoing/{transaction}', [OutgoingController::class, 'show'])->name('outgoing.show');
+    Route::get('/outgoing/export', [OutgoingController::class, 'export'])->name('outgoing.export');
 
     Route::get('/reports', function () {
         return view('inventory.reports');

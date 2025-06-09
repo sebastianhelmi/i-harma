@@ -70,3 +70,4 @@ Route::prefix('admin')->middleware(['auth', 'role:Admin'])->group(function () {
 require __DIR__ . '/purchasing.php';
 require __DIR__ . '/inventory.php';
 require __DIR__ . '/head-of-division.php';
+require __DIR__ . '/delivery.php';

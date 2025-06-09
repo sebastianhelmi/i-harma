@@ -42,8 +42,8 @@
                     <span>Incoming</span>
                 </a>
 
-                <a href="{{ route('inventory.outgoing') }}"
-                    class="nav-item {{ request()->routeIs('inventory.outgoing') ? 'active' : '' }}">
+                <a href="{{ route('inventory.outgoing.index') }}"
+                    class="nav-item {{ request()->routeIs('inventory.outgoing.index') ? 'active' : '' }}">
                     <i class="icon" data-lucide="upload"></i>
                     <span>Outgoing</span>
                 </a>
@@ -119,25 +119,25 @@
     </script>
     @stack('scripts')
     @if (session('success'))
-        <script type="module">
-            Swal.fire({
+    <script type="module">
+        Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
             });
-        </script>
+    </script>
     @endif
 
     @if (session('error'))
-        <script type="module">
-            Swal.fire({
+    <script type="module">
+        Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}"
             });
-        </script>
+    </script>
     @endif
 </body>
 

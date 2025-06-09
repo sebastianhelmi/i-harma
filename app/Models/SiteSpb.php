@@ -12,7 +12,8 @@ class SiteSpb extends Model
         'unit',
         'quantity',
         'information',
-        'document_file'
+        'document_file',
+        'delivery_plan_id'
     ];
 
     protected $casts = [
@@ -22,5 +23,10 @@ class SiteSpb extends Model
     public function spb()
     {
         return $this->belongsTo(Spb::class);
+    }
+
+    public function deliveryPlan()
+    {
+        return $this->belongsTo(DeliveryPlan::class);
     }
 }

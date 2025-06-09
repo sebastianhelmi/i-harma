@@ -19,6 +19,9 @@ return new class extends Migration
             $table->integer('quantity');
             $table->text('information');
             $table->json('document_file')->nullable();
+            $table->foreignId('delivery_plan_id')->nullable()
+                ->constrained('delivery_plans')
+                ->nullOnDelete();
             $table->timestamps();
         });
     }

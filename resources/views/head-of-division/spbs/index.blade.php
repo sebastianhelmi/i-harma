@@ -21,10 +21,10 @@
     </div>
 
     @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            {{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
     @endif
 
     <!-- Search & Filter Section -->
@@ -36,30 +36,27 @@
                         <span class="input-group-text">
                             <i class="fas fa-search"></i>
                         </span>
-                        <input type="text"
-                               class="form-control"
-                               name="search"
-                               value="{{ request('search') }}"
-                               placeholder="Cari nomor SPB atau proyek...">
+                        <input type="text" class="form-control" name="search" value="{{ request('search') }}"
+                            placeholder="Cari nomor SPB atau proyek...">
                     </div>
                 </div>
                 <div class="col-md-3">
                     <select name="project_id" class="form-select">
                         <option value="">Semua Proyek</option>
                         @foreach($projects as $id => $name)
-                            <option value="{{ $id }}" @selected(request('project_id') == $id)>
-                                {{ $name }}
-                            </option>
+                        <option value="{{ $id }}" @selected(request('project_id')==$id)>
+                            {{ $name }}
+                        </option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-md-3">
                     <select name="status" class="form-select">
                         <option value="">Semua Status</option>
-                        <option value="pending" @selected(request('status') == 'pending')>Pending</option>
-                        <option value="approved" @selected(request('status') == 'approved')>Disetujui</option>
-                        <option value="rejected" @selected(request('status') == 'rejected')>Ditolak</option>
-                        <option value="completed" @selected(request('status') == 'completed')>Selesai</option>
+                        <option value="pending" @selected(request('status')=='pending' )>Pending</option>
+                        <option value="approved" @selected(request('status')=='approved' )>Disetujui</option>
+                        <option value="rejected" @selected(request('status')=='rejected' )>Ditolak</option>
+                        <option value="completed" @selected(request('status')=='completed' )>Selesai</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -91,63 +88,60 @@
                     </thead>
                     <tbody>
                         @forelse($spbs as $spb)
-                            <tr>
-                                <td>{{ $spb->spb_number }}</td>
-                                <td>{{ $spb->spb_date->format('d M Y') }}</td>
-                                <td>{{ $spb->project->name }}</td>
-                                <td>{{ $spb->task->name }}</td>
-                                <td>{{ $spb->itemCategory->name }}</td>
-                                <td>
-                                    <span class="badge bg-info">
-                                        {{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-{{ $spb->getStatusBadgeClass() }}">
-                                        {{ match($spb->status) {
-                                            'pending' => 'Pending',
-                                            'approved' => 'Disetujui',
-                                            'rejected' => 'Ditolak',
-                                            'completed' => 'Selesai',
-                                        } }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-secondary">
-                                        {{ match($spb->status_po) {
-                                            'waiting' => 'Menunggu',
-                                            'not_required' => 'Tidak Perlu PO',
-                                            'pending' => 'Menunggu PO',
-                                            'ordered' => 'Sudah PO',
-                                            'completed' => 'PO Selesai',
-                                        } }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <a href="{{ route('head-of-division.spbs.show', $spb) }}"
-                                           class="btn btn-sm btn-info"
-                                           title="Detail">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
+                        <tr>
+                            <td>{{ $spb->spb_number }}</td>
+                            <td>{{ $spb->spb_date->format('d M Y') }}</td>
+                            <td>{{ $spb->project->name }}</td>
+                            <td>{{ $spb->task->name }}</td>
+                            <td>{{ $spb->itemCategory->name }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ $spb->category_entry === 'site' ? 'Site' : 'Workshop' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-{{ $spb->getStatusBadgeClass() }}">
+                                    {{ match($spb->status) {
+                                    'pending' => 'Pending',
+                                    'approved' => 'Disetujui',
+                                    'rejected' => 'Ditolak',
+                                    'completed' => 'Selesai',
+                                    } }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ match($spb->status_po) {
+                                    'waiting' => 'Menunggu',
+                                    'not_required' => 'Tidak Perlu PO',
+                                    'pending' => 'Menunggu PO',
+                                    'ordered' => 'Sudah PO',
+                                    'completed' => 'PO Selesai',
+                                    } }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <a href="{{ route('head-of-division.spbs.show', $spb) }}"
+                                        class="btn btn-sm btn-info" title="Detail">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
 
-                                        @if($spb->can_take_items)
-                                            <button type="button"
-                                                    class="btn btn-sm btn-success"
-                                                    title="Ambil Barang"
-                                                    onclick="confirmTakeItems('{{ $spb->id }}', '{{ $spb->spb_number }}')">
-                                                <i class="fas fa-hand-holding"></i>
-                                            </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    @if($spb->can_take_items && $spb->category_entry !== 'site')
+                                    <button type="button" class="btn btn-sm btn-success" title="Ambil Barang"
+                                        onclick="confirmTakeItems('{{ $spb->id }}', '{{ $spb->spb_number }}')">
+                                        <i class="fas fa-hand-holding"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="9" class="text-center py-4">
-                                    <div class="text-muted">Tidak ada SPB yang ditemukan</div>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="9" class="text-center py-4">
+                                <div class="text-muted">Tidak ada SPB yang ditemukan</div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -166,7 +160,8 @@
     .badge {
         padding: 0.5em 0.75em;
     }
-    .table > :not(caption) > * > * {
+
+    .table> :not(caption)>*>* {
         padding: 1rem 0.75rem;
     }
 </style>
@@ -209,7 +204,7 @@
 
 @push('scripts')
 <script>
-let takeItemsModal;
+    let takeItemsModal;
 
 document.addEventListener('DOMContentLoaded', function() {
     takeItemsModal = new bootstrap.Modal(document.getElementById('takeItemsModal'));

@@ -13,12 +13,15 @@ return new class extends Migration
     {
         Schema::create('delivery_draft_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('delivery_plan_id')->constrained('delivery_plans')->onDelete('cascade'); // Relasi ke rencana delivery
-            $table->boolean('is_consigned')->default(false); // Apakah item titipan
-            $table->string('item_name'); // Nama item yang akan dikirim
-            $table->integer('quantity'); // Jumlah item
-            $table->string('unit'); // Satuan item (pcs, kg, liter, dll.)
-            $table->text('item_notes')->nullable(); // Keterangan tambahan
+            $table->foreignId('delivery_plan_id')->constrained()->onDelete('cascade');
+            $table->string('item_name');
+            $table->integer('quantity');
+            $table->string('unit');
+            $table->boolean('is_consigned')->default(false);
+            $table->text('item_notes')->nullable();
+            $table->enum('source_type', ['inventory', 'workshop_output', 'site_spb', 'manual']);
+            $table->unsignedBigInteger('source_id')->nullable();
+            $table->foreignId('inventory_id')->nullable()->constrained()->nullOnDelete();
             $table->timestamps();
         });
     }

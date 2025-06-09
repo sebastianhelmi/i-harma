@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('expedition')->nullable(); // Nama ekspedisi atau pengiriman
             $table->string('vehicle_license_plate'); // Nomor Polisi kendaraan
             $table->string('vehicle_type'); // Jenis kendaraan (misal: truk, mobil box)
+            $table->foreignId('created_by')->constrained('users')->onDelete('cascade'); // Add this line
             $table->timestamps();
         });
     }

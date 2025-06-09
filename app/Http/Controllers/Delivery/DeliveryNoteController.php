@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\DeliveryPlan;
 use App\Models\DeliveryNote;
 use App\Models\InventoryTransaction;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use PDF;
 
 class DeliveryNoteController extends Controller
 {
@@ -101,8 +103,13 @@ class DeliveryNoteController extends Controller
                 }
             }
 
-            // Update plan status
-            $plan->update(['status' => 'completed']);
+
+            // Update plan status to shipping instead of completed
+            $plan->update([
+                'status' => DeliveryPlan::STATUS_SHIPPING,
+                'updated_by' => Auth::id()
+            ]);
+
 
             DB::commit();
 
@@ -115,5 +122,20 @@ class DeliveryNoteController extends Controller
                 ->with('error', 'Terjadi kesalahan: ' . $e->getMessage())
                 ->withInput();
         }
+    }
+
+    public function print(DeliveryNote $note)
+    {
+        $note->load([
+            'deliveryPlan.draftItems',
+            'deliveryPlan.packings',
+            'document',
+            'creator'
+        ]);
+
+        $pdf = FacadePdf::loadView('delivery.notes.print', compact('note'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->stream("surat-jalan-{$note->delivery_note_number}.pdf");
     }
 }

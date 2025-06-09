@@ -53,6 +53,13 @@ class UserSeeder extends Seeder
                 'role_id' => 4, // Kepala Divisi role
             ],
             [
+                'name' => 'Kepala Divisi Civil',
+                'email' => 'kadivciv@example.com',
+                'password' => Hash::make('password123'),
+                'role_id' => 4, // Kepala Divisi role
+                'division_id' => 3, // Kepala Divisi role
+            ],
+            [
                 'name' => 'Delivery',
                 'email' => 'delivery@example.com',
                 'password' => Hash::make('password123'),

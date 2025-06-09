@@ -131,6 +131,10 @@
                             <p class="mb-1">{{ $note->expedition }}</p>
                             <small>{{ $note->vehicle_license_plate }} ({{ $note->vehicle_type }})</small>
                         </a>
+                        <a href="{{ route('delivery.notes.print', $note) }}" class="btn btn-sm btn-primary"
+                            target="_blank">
+                            <i class="fas fa-print me-1"></i>Cetak
+                        </a>
                         @endforeach
                     </div>
                 </div>

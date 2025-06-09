@@ -42,6 +42,8 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
     Route::prefix('notes')->name('notes.')->group(function () {
         Route::get('/create/{plan}', [DeliveryNoteController::class, 'create'])->name('create');
         Route::post('/{plan}', [DeliveryNoteController::class, 'store'])->name('store');
+        Route::get('/{plan}/items/create', [DeliveryPlanItemController::class, 'create'])->name('items.create');
+        Route::get('/{note}/print', [DeliveryNoteController::class, 'print'])->name('print');
     });
 
     // // Shipments (Pengiriman)

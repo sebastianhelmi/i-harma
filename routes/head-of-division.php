@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HeadOfDivision\DeliveryConfirmationController;
 use App\Http\Controllers\HeadOfDivision\ProjectController;
 use App\Http\Controllers\HeadOfDivision\SpbController;
 use App\Http\Controllers\HeadOfDivision\TaskController;
@@ -21,6 +22,16 @@ Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->n
     Route::get('/spbs/{spb}/items', [SpbController::class, 'getItems'])->name('spbs.items');
     Route::patch('/spbs/{spb}/take-items', [SpbController::class, 'takeItems'])->name('spbs.take-items');
 
+    Route::middleware('division:3')->group(function () {
+        Route::get('/delivery-confirmations', [DeliveryConfirmationController::class, 'index'])
+            ->name('delivery-confirmations.index');
+        Route::get('/delivery-confirmations/{plan}', [DeliveryConfirmationController::class, 'show'])
+            ->name('delivery-confirmations.show');
+        Route::post('/delivery-confirmations/{plan}/approve', [DeliveryConfirmationController::class, 'approve'])
+            ->name('delivery-confirmations.approve');
+        Route::post('/delivery-confirmations/{plan}/reject', [DeliveryConfirmationController::class, 'reject'])
+            ->name('delivery-confirmations.reject');
+    });
 });
 
 Route::middleware('auth')->prefix('api')->group(function () {

@@ -20,6 +20,11 @@ class DivisionSeeder extends Seeder
                 'code' => 'Mec',
                 'description' => 'Mechanical Division'
             ],
+            [
+                'name' => 'Civil',
+                'code' => 'civ',
+                'description' => 'Civil Division'
+            ],
         ];
 
         DB::table('divisions')->insert($divisions);

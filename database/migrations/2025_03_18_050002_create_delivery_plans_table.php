@@ -19,8 +19,14 @@ return new class extends Migration
             $table->integer('vehicle_count'); // Jumlah kendaraan yang dibutuhkan
             $table->enum('vehicle_type', ['truck', 'pickup', 'box', 'container']); // Jenis kendaraan
             $table->text('delivery_notes')->nullable(); // Catatan pengiriman
-            $table->enum('status', ['draft', 'packing', 'ready', 'completed', 'cancelled'])
-                ->default('draft'); // Status rencana
+            $table->enum('status', [
+                'draft',
+                'packing',
+                'ready',
+                'shipping',     // Add this
+                'completed',
+                'cancelled'
+            ])->default('draft');
             $table->foreignId('created_by')->constrained('users'); // Pembuat rencana
             $table->foreignId('updated_by')->nullable()->constrained('users'); // Pengubah terakhir
             $table->timestamps();

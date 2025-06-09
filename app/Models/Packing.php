@@ -24,7 +24,9 @@ class Packing extends Model
             'pallet' => 'Pallet',
             'crate' => 'Crate',
             'barrel' => 'Barrel',
-            'bag' => 'Bag'
+            'bag' => 'Bag',
+            'bundle' => 'Bundle',
+            'loose' => 'Loose'
         ];
     }
 

@@ -58,36 +58,28 @@ class DeliveryNoteController extends Controller
                 'created_by' => Auth::id()
             ]);
 
-            // Upload documents
+            // Upload documents with proper field mapping
             $documents = [
-                'vehicle_license_plate' => $validated['vehicle_license_plate'] // Add this line
+                'vehicle_license_plate' => $validated['vehicle_license_plate']
+            ];
+
+            // Map file types to database field names
+            $fileMapping = [
+                'stnk' => 'stnk_photo',
+                'license_plate' => 'license_plate_photo',
+                'vehicle' => 'vehicle_photo',
+                'driver_license' => 'driver_license_photo',
+                'driver_id' => 'driver_id_photo',
+                'loading' => 'loading_process_photo'  // Fix the field name mapping
             ];
 
             foreach ($validated['document_files'] as $type => $file) {
                 $path = $file->store('delivery-documents', 'public');
-                switch ($type) {
-                    case 'stnk':
-                        $documents['stnk_photo'] = $path;
-                        break;
-                    case 'license_plate':
-                        $documents['license_plate_photo'] = $path;
-                        break;
-                    case 'vehicle':
-                        $documents['vehicle_photo'] = $path;
-                        break;
-                    case 'driver_license':
-                        $documents['driver_license_photo'] = $path;
-                        break;
-                    case 'driver_id':
-                        $documents['driver_id_photo'] = $path;
-                        break;
-                    case 'loading':
-                        $documents['loading_process_photo'] = $path;
-                        break;
-                }
+                $fieldName = $fileMapping[$type];
+                $documents[$fieldName] = $path;
             }
 
-            // Create document records with vehicle_license_plate
+            // Create document records with all required fields
             $note->document()->create($documents);
 
             // Create inventory transactions

@@ -12,8 +12,10 @@ class DeliveryPlan extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_PACKING = 'packing';
     public const STATUS_READY = 'ready';
+    public const STATUS_SHIPPING = 'shipping';    // Add this line
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
+
 
     protected $fillable = [
         'plan_number',
@@ -65,24 +67,24 @@ class DeliveryPlan extends Model
             self::STATUS_DRAFT => 'Draft',
             self::STATUS_PACKING => 'Packing',
             self::STATUS_READY => 'Siap Kirim',
+            self::STATUS_SHIPPING => 'Dalam Pengiriman', // Add this line
             self::STATUS_COMPLETED => 'Selesai',
             self::STATUS_CANCELLED => 'Dibatalkan',
             default => 'Unknown'
         };
     }
-
     public function getStatusBadgeClass(): string
     {
         return match ($this->status) {
             self::STATUS_DRAFT => 'secondary',
             self::STATUS_PACKING => 'info',
             self::STATUS_READY => 'primary',
+            self::STATUS_SHIPPING => 'warning',    // Add this line
             self::STATUS_COMPLETED => 'success',
             self::STATUS_CANCELLED => 'danger',
             default => 'secondary'
         };
     }
-
     // Authorization Methods
     public function canBeUpdated(): bool
     {

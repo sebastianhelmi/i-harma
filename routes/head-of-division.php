@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\HeadOfDivision\DeliveryConfirmationController;
 use App\Http\Controllers\HeadOfDivision\ProjectController;
+use App\Http\Controllers\HeadOfDivision\ReportController;
 use App\Http\Controllers\HeadOfDivision\SpbController;
 use App\Http\Controllers\HeadOfDivision\TaskController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,8 @@ Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->n
         Route::post('/delivery-confirmations/{plan}/reject', [DeliveryConfirmationController::class, 'reject'])
             ->name('delivery-confirmations.reject');
     });
+
+    Route::resource('reports', ReportController::class);
 });
 
 Route::middleware('auth')->prefix('api')->group(function () {

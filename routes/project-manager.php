@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectManager\SpbApprovalController;
+use App\Http\Controllers\ProjectManager\ProcurementHistoryController;
 use App\Http\Controllers\TaskController;
 use Illuminate\Support\Facades\Route;
 
@@ -22,4 +23,7 @@ Route::middleware(['auth', 'role:Project Manager'])->prefix('pm')->name('pm.')->
     Route::get('/spb-approvals/{spb}', [SpbApprovalController::class, 'show'])->name('spb-approvals.show');
     Route::post('/spb-approvals/{spb}/approve', [SpbApprovalController::class, 'approve'])->name('spb-approvals.approve');
     Route::post('/spb-approvals/{spb}/reject', [SpbApprovalController::class, 'reject'])->name('spb-approvals.reject');
+
+     Route::get('/riwayat-pengadaan', [ProcurementHistoryController::class, 'index'])
+        ->name('riwayat.index');
 });

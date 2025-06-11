@@ -38,10 +38,11 @@
                         <span>Tugas</span>
                     </a>
                 </li>
-                {{-- {{ request()->routeIs('kadiv.reports*') ? 'active' : '' }} --}}
-                {{-- {{ route('kadiv.reports.index') }} --}}
-                <li class="">
-                    <a href="" class="reports-link">
+
+                <li class="{{ request()->routeIs('head-of-division.reports*') ? 'active' : '' }}">
+                    <a href="{{ route('head-of-division.reports.index') }}" class="reports-link">
+                        {{-- {{ request()->routeIs('kadiv.reports*') ? 'active' : '' }} --}}
+                        {{-- {{ route('kadiv.reports.index') }} --}}
                         <i class="fas fa-chart-line"></i>
                         <span>Laporan</span>
                     </a>

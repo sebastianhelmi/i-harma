@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
@@ -89,5 +90,28 @@ class User extends Authenticatable
     public function isKepalaDivisi(): bool
     {
         return $this->role->name === 'Kepala Divisi';
+    }
+
+    /**
+     * Get the user's notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function notifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Get the user's unread notifications.
+     *
+     * @return DatabaseNotificationCollection
+     */
+    public function unreadNotifications()
+    {
+        return $this->notifications()
+            ->whereNull('read_at')
+            ->get();
     }
 }

@@ -19,6 +19,21 @@
                 <div class="row g-4">
                     <!-- Delivery Destination -->
                     <div class="col-md-12">
+                        <label class="form-label required">Project</label>
+                        <select name="project_id" class="form-select @error('project_id') is-invalid @enderror"
+                            required>
+                            <option value="">Pilih Project</option>
+                            @foreach($projects as $project)
+                            <option value="{{ $project->id }}" {{ old('project_id')==$project->id ? 'selected' : '' }}>
+                                {{ $project->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('project_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-12">
                         <label class="form-label required">Tujuan Pengiriman</label>
                         <input type="text" name="destination"
                             class="form-control @error('destination') is-invalid @enderror"

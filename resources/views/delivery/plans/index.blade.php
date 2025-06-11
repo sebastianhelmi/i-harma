@@ -50,6 +50,7 @@
                     <thead>
                         <tr>
                             <th>No. Rencana</th>
+                            <th>Project</th> <!-- Tambahkan ini -->
                             <th>Tujuan</th>
                             <th>Tgl. Rencana</th>
                             <th>Kendaraan</th>
@@ -62,6 +63,7 @@
                         @forelse($plans as $plan)
                         <tr>
                             <td>{{ $plan->plan_number }}</td>
+                            <td>{{ $plan->project->name ?? '-' }}</td> <!-- Tambahkan ini -->
                             <td>{{ $plan->destination }}</td>
                             <td>{{ $plan->planned_date->format('d/m/Y') }}</td>
                             <td>

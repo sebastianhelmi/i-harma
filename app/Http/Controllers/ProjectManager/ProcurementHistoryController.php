@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ProjectManager;
 
+use App\Http\Controllers\Controller;
 use App\Models\ProcurementHistory;
 use Illuminate\Http\Request;
 
@@ -9,9 +10,13 @@ class ProcurementHistoryController extends Controller
 {
     public function index(Request $request)
     {
-        $query = ProcurementHistory::with(['spb.division', 'po', 'actor'])
-            ->latest();
-
+        $query = ProcurementHistory::with([
+            'spb.task.division', 
+            'spb.requester', 
+            'po', 
+            'actor'
+        ])
+        ->latest();
         // Filter by document type
         if ($request->has('type')) {
             $query->where('document_type', $request->type);
@@ -29,9 +34,8 @@ class ProcurementHistoryController extends Controller
         if ($request->has('to_date')) {
             $query->whereDate('created_at', '<=', $request->to_date);
         }
-
         $histories = $query->paginate(10)
-            ->withQueryString();
+        ->withQueryString();
 
         return view('pm.riwayat.index', compact('histories'));
     }

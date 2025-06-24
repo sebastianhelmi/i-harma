@@ -90,4 +90,14 @@ class Spb extends Model
 
         return $prefix . str_pad($number, 3, '0', STR_PAD_LEFT);
     }
+
+    public function division()
+    {
+        return $this->task->division();
+    }
+
+    public function getDivisionNameAttribute()
+    {
+        return $this->task?->division?->name ?? 'N/A';
+    }
 }

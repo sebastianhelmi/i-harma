@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Nama tugas
             $table->text('description')->nullable(); // Deskripsi tugas
+            $table->string('drawing_file');
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade'); // Relasi ke proyek
             $table->foreignId('division_id')
                 ->nullable()

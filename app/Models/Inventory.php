@@ -13,6 +13,7 @@ class Inventory extends Model
         'initial_stock',
         'item_category_id',
         'unit',
+        'weight',
         'unit_price',
         'added_by',
     ];

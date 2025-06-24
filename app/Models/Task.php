@@ -32,12 +32,18 @@ class Task extends Model
     protected $fillable = [
         'name',
         'description',
+        'drawing_file',
         'project_id',
         'assigned_to',
         'due_date',
         'status',
         'parent_task_id',
     ];
+
+    public function getDrawingUrl()
+    {
+        return $this->drawing_file ? asset('storage/' . $this->drawing_file) : null;
+    }
 
     public function project()
     {

@@ -43,6 +43,7 @@ class InventoryController extends Controller
             'initial_stock' => 'required|integer|min:0',
             'unit' => 'required|string|max:50',
             'unit_price' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         $validated['quantity'] = $validated['initial_stock'];
@@ -69,6 +70,7 @@ class InventoryController extends Controller
             'item_category_id' => 'required|exists:item_categories,id',
             'unit' => 'required|string|max:50',
             'unit_price' => 'nullable|numeric|min:0',
+            'weight' => 'nullable|numeric|min:0',
         ]);
 
         $item->update($validated);

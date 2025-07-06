@@ -137,6 +137,8 @@ class ReceivedGoodsController extends Controller
 
                     // Update inventory
                     $inventory = Inventory::findOrFail($item['inventory_id']);
+                    $currentStock = $inventory->quantity;
+                    $newStock = $currentStock + $item['quantity_received'];
                     $inventory->increment('quantity', $item['quantity_received']);
 
                     // Record transaction
@@ -147,7 +149,8 @@ class ReceivedGoodsController extends Controller
                         'transaction_type' => InventoryTransaction::TYPE_IN,
                         'transaction_date' => now(),
                         'handled_by' => Auth::id(),
-                        'remarks' => $validated['remarks'] ?? null
+                        'remarks' => $validated['remarks'] ?? null,
+                        'stock_after_transaction' => $newStock
                     ]);
                 }
 

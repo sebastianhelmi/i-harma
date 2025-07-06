@@ -35,10 +35,13 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'client_name' => 'required|string|max:255',
+            'project_location' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
             'status' => 'required|in:pending,ongoing,completed',
-            'files.*' => 'nullable|file|max:10240' // Max 10MB per file
+            'files.*' => 'nullable|file|max:10240', // Max 10MB per file
+            'contract_document' => 'nullable|file|max:10240'
         ]);
 
         $files = [];
@@ -49,14 +52,22 @@ class ProjectController extends Controller
             }
         }
 
+        $contractDocumentPath = null;
+        if ($request->hasFile('contract_document')) {
+            $contractDocumentPath = $request->file('contract_document')->store('contracts', 'public');
+        }
+
         $project = Project::create([
             'name' => $validated['name'],
             'description' => $validated['description'],
+            'client_name' => $validated['client_name'],
+            'project_location' => $validated['project_location'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'status' => $validated['status'],
             'manager_id' => Auth::id(),
-            'files' => $files
+            'files' => $files,
+            'contract_document' => $contractDocumentPath
         ]);
 
         return redirect()
@@ -84,10 +95,13 @@ class ProjectController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
+            'client_name' => 'required|string|max:255',
+            'project_location' => 'required|string|max:255',
             'start_date' => 'required|date',
             'end_date' => 'nullable|date|after:start_date',
             'status' => 'required|in:pending,ongoing,completed',
-            'files.*' => 'nullable|file|max:10240'
+            'files.*' => 'nullable|file|max:10240',
+            'contract_document' => 'nullable|file|max:10240'
         ]);
 
         $files = $project->files ?? [];
@@ -99,13 +113,25 @@ class ProjectController extends Controller
             }
         }
 
+        $contractDocumentPath = $project->contract_document;
+        if ($request->hasFile('contract_document')) {
+            // Delete old contract document if it exists
+            if ($project->contract_document) {
+                Storage::disk('public')->delete($project->contract_document);
+            }
+            $contractDocumentPath = $request->file('contract_document')->store('contracts', 'public');
+        }
+
         $project->update([
             'name' => $validated['name'],
             'description' => $validated['description'],
+            'client_name' => $validated['client_name'],
+            'project_location' => $validated['project_location'],
             'start_date' => $validated['start_date'],
             'end_date' => $validated['end_date'],
             'status' => $validated['status'],
-            'files' => $files
+            'files' => $files,
+            'contract_document' => $contractDocumentPath
         ]);
 
         return redirect()
@@ -125,6 +151,11 @@ class ProjectController extends Controller
             foreach ($project->files as $file) {
                 Storage::disk('public')->delete($file);
             }
+        }
+
+        // Delete contract document
+        if ($project->contract_document) {
+            Storage::disk('public')->delete($project->contract_document);
         }
 
         $project->delete();

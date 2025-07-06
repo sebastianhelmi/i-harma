@@ -77,6 +77,9 @@ class OutgoingController extends Controller
                 throw new \Exception('Stok tidak mencukupi');
             }
 
+            $currentStock = $inventory->quantity;
+            $newStock = $currentStock - $validated['quantity'];
+
             // Create outgoing transaction
             InventoryTransaction::create([
                 'inventory_id' => $validated['inventory_id'],
@@ -84,7 +87,8 @@ class OutgoingController extends Controller
                 'transaction_type' => 'out',
                 'transaction_date' => $validated['transaction_date'],
                 'handled_by' => Auth::id(),
-                'remarks' => $validated['remarks']
+                'remarks' => $validated['remarks'],
+                'stock_after_transaction' => $newStock
             ]);
 
             // Update inventory quantity

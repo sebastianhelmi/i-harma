@@ -10,11 +10,14 @@ class Project extends Model
     protected $fillable = [
         'name',
         'description',
+        'client_name',
+        'project_location',
         'start_date',
         'end_date',
         'status',
         'manager_id',
-        'files'
+        'files',
+        'contract_document'
     ];
 
     protected $casts = [

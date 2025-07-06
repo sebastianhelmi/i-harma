@@ -50,9 +50,8 @@ class SpbController extends Controller
 
         // Check which SPBs have items ready to take
         foreach ($spbs as $spb) {
-            $spb->can_take_items = $spb->status === 'approved' &&
-                $spb->po &&
-                $spb->po->status === 'completed';
+            $spb->can_take_items = ($spb->status === 'approved' && $spb->po && $spb->po->status === 'completed') ||
+                                   ($spb->status === 'approved' && $spb->status_po === 'not_required');
         }
 
         return view('head-of-division.spbs.index', compact('spbs', 'projects'));
@@ -225,7 +224,7 @@ class SpbController extends Controller
             }
 
             // Verify SPB status and load PO
-            if ($spb->status !== 'approved' || !$spb->po || $spb->po->status !== 'completed') {
+            if ($spb->status !== 'approved' || ($spb->status_po !== 'not_required' && (!$spb->po || $spb->po->status !== 'completed'))) {
                 return back()->with('error', 'SPB ini belum siap untuk pengambilan barang.');
             }
 
@@ -248,7 +247,7 @@ class SpbController extends Controller
                     // Record transaction with po_id
                     InventoryTransaction::create([
                         'inventory_id' => $inventory->id,
-                        'po_id' => $spb->po->id, // Add PO ID here
+                        'po_id' => $spb->po->id ?? null, // Set to null if PO is not required
                         'quantity' => $item->quantity,
                         'transaction_type' => 'OUT',
                         'transaction_date' => now(),
@@ -272,7 +271,7 @@ class SpbController extends Controller
                     // Record transaction with po_id
                     InventoryTransaction::create([
                         'inventory_id' => $inventory->id,
-                        'po_id' => $spb->po->id, // Add PO ID here
+                        'po_id' => $spb->po->id ?? null, // Set to null if PO is not required
                         'quantity' => $item->quantity,
                         'transaction_type' => 'OUT',
                         'transaction_date' => now(),

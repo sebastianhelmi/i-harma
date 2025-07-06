@@ -59,6 +59,30 @@
                                     @enderror
                                 </div>
 
+                                <div class="mb-3">
+                                    <label class="form-label required">Client Name</label>
+                                    <input type="text"
+                                           name="client_name"
+                                           class="form-control @error('client_name') is-invalid @enderror"
+                                           value="{{ old('client_name', $project->client_name) }}"
+                                           required>
+                                    @error('client_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label required">Project Location</label>
+                                    <input type="text"
+                                           name="project_location"
+                                           class="form-control @error('project_location') is-invalid @enderror"
+                                           value="{{ old('project_location', $project->project_location) }}"
+                                           required>
+                                    @error('project_location')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
                                 <div class="row">
                                     <div class="col-md-6 mb-3">
                                         <label class="form-label required">Start Date</label>
@@ -142,6 +166,39 @@
                                            multiple>
                                     <small class="text-muted">Upload multiple files (max 10MB each)</small>
                                     @error('files.*')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">Contract Document</h5>
+
+                                @if($project->contract_document)
+                                    <div class="mb-3">
+                                        <label class="form-label d-block">Current Document</label>
+                                        <div class="list-group">
+                                            <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                                <a href="{{ Storage::url($project->contract_document) }}"
+                                                   target="_blank"
+                                                   class="text-decoration-none text-body">
+                                                    <i class="icon" data-lucide="file-text"></i>
+                                                    {{ basename($project->contract_document) }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+
+                                <div class="mb-3">
+                                    <label class="form-label">Upload New Contract</label>
+                                    <input type="file"
+                                           name="contract_document"
+                                           class="form-control @error('contract_document') is-invalid @enderror">
+                                    <small class="text-muted">Uploading a new file will replace the old one.</small>
+                                    @error('contract_document')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>

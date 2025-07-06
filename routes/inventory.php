@@ -15,6 +15,7 @@ Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('invent
     Route::post('/items', [InventoryController::class, 'store'])->name('items.store');
     Route::get('/items/{item}/edit', [InventoryController::class, 'edit'])->name('items.edit');
     Route::put('/items/{item}', [InventoryController::class, 'update'])->name('items.update');
+    Route::get('/items/{item}/history', [InventoryController::class, 'history'])->name('items.history');
 
     Route::resource('received-goods', ReceivedGoodsController::class)->only(['index', 'create', 'store']);
 

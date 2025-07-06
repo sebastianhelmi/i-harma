@@ -79,4 +79,11 @@ class InventoryController extends Controller
             ->route('inventory.items.index')
             ->with('success', 'Item berhasil diperbarui');
     }
+
+    public function history(Inventory $item)
+    {
+        $transactions = $item->transactions()->with('handler')->latest('transaction_date')->paginate(15);
+
+        return view('inventory.items.history', compact('item', 'transactions'));
+    }
 }

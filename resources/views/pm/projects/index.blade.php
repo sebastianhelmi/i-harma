@@ -61,6 +61,8 @@
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                <th>Client Name</th>
+                                <th>Project Location</th>
                                 <th>Description</th>
                                 <th>Start Date</th>
                                 <th>End Date</th>
@@ -73,6 +75,8 @@
                             @forelse($projects as $project)
                                 <tr>
                                     <td>{{ $project->name }}</td>
+                                    <td>{{ $project->client_name }}</td>
+                                    <td>{{ $project->project_location }}</td>
                                     <td>{{ $project->description }}</td>
                                     <td>{{ $project->start_date->format('M d, Y') }}</td>
                                     <td>{{ $project->end_date?->format('M d, Y') ?? '-' }}</td>
@@ -162,6 +166,16 @@
                             <label class="form-label">Description</label>
                             <textarea class="form-control" name="description" rows="3" required>{{ old('description') }}</textarea>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">Client Name</label>
+                            <input type="text" class="form-control" name="client_name"
+                                value="{{ old('client_name') }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Project Location</label>
+                            <input type="text" class="form-control" name="project_location"
+                                value="{{ old('project_location') }}" required>
+                        </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Start Date</label>
@@ -183,9 +197,13 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Project Files</label>
+                            <label class="form-label">Project Drawing Files</label>
                             <input type="file" class="form-control" name="files[]" multiple>
                             <small class="text-muted">You can select multiple files</small>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Contract Document</label>
+                            <input type="file" class="form-control" name="contract_document">
                         </div>
                     </div>
                     <div class="modal-footer">

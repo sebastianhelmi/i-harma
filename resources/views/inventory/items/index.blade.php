@@ -86,10 +86,10 @@
                                                 class="btn btn-sm btn-warning" title="Edit Item">
                                                 <i class="fas fa-edit"></i>
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-info" title="Riwayat Transaksi"
-                                                onclick="showTransactionHistory({{ $item->id }})">
+                                            <a href="{{ route('inventory.items.history', $item) }}"
+                                                class="btn btn-sm btn-info" title="Riwayat Transaksi">
                                                 <i class="fas fa-history"></i>
-                                            </button>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

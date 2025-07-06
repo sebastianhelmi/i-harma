@@ -14,7 +14,8 @@ class InventoryTransaction extends Model
         'transaction_type',
         'transaction_date',
         'handled_by',
-        'remarks'
+        'remarks',
+        'stock_after_transaction'
     ];
 
     protected $casts = [

@@ -27,4 +27,9 @@ class Inventory extends Model
     {
         return $this->belongsTo(User::class, 'added_by');
     }
+
+    public function transactions()
+    {
+        return $this->hasMany(InventoryTransaction::class);
+    }
 }

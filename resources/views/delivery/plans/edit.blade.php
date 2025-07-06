@@ -19,6 +19,22 @@
                 @method('PUT')
 
                 <div class="row g-4">
+                    <div class="col-md-12">
+                        <label class="form-label required">Project</label>
+                        <select name="project_id" class="form-select @error('project_id') is-invalid @enderror"
+                            required>
+                            <option value="">Pilih Project</option>
+                            @foreach($projects as $project)
+                            <option value="{{ $project->id }}" {{ old('project_id', $plan->project_id) == $project->id ?
+                                'selected' : '' }}>
+                                {{ $project->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                        @error('project_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
                     <!-- Plan Number (Read Only) -->
                     <div class="col-md-6">
                         <label class="form-label text-muted">Nomor Rencana</label>

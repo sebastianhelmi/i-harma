@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\InventoryManagementController;
 use App\Http\Controllers\Admin\ItemCategoryManagement;
 use App\Http\Controllers\Admin\UserManagementController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -64,6 +65,12 @@ Route::prefix('admin')->middleware(['auth', 'role:Admin'])->group(function () {
         ->name('admin.inventory.destroy');
     Route::patch('/inventory/{inventory}/stock', [InventoryManagementController::class, 'updateStock'])
         ->name('admin.inventory.update-stock');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])->name('notifications.mark-read');
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark-all-read');
 });
 
 

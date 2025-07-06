@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Delivery;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryPlan;
+use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -53,13 +54,15 @@ class DeliveryPlanController extends Controller
             'box' => 'Box',
             'container' => 'Container'
         ];
+        $projects = Project::orderBy('name')->get();
 
-        return view('delivery.plans.create', compact('vehicleTypes'));
+        return view('delivery.plans.create', compact('vehicleTypes', 'projects'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
             'destination' => 'required|string|max:255',
             'planned_date' => 'required|date|after_or_equal:today',
             'vehicle_count' => 'required|integer|min:1',
@@ -68,6 +71,7 @@ class DeliveryPlanController extends Controller
         ]);
 
         $plan = DeliveryPlan::create([
+            'project_id' => $validated['project_id'],
             'plan_number' => $this->generatePlanNumber(),
             'destination' => strtoupper($validated['destination']),
             'planned_date' => $validated['planned_date'],
@@ -108,8 +112,9 @@ class DeliveryPlanController extends Controller
             'box' => 'Box',
             'container' => 'Container'
         ];
+        $projects = Project::orderBy('name')->get(); // Tambahkan baris ini
 
-        return view('delivery.plans.edit', compact('plan', 'vehicleTypes'));
+        return view('delivery.plans.edit', compact('plan', 'vehicleTypes', 'projects')); // Tambahkan $projects
     }
 
     public function update(Request $request, DeliveryPlan $plan)
@@ -119,6 +124,7 @@ class DeliveryPlanController extends Controller
         }
 
         $validated = $request->validate([
+            'project_id' => 'required|exists:projects,id',
             'destination' => 'required|string|max:255',
             'planned_date' => 'required|date|after_or_equal:today',
             'vehicle_count' => 'required|integer|min:1',

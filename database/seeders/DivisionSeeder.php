@@ -20,9 +20,9 @@ class DivisionSeeder extends Seeder
                 'code' => 'Mec',
                 'description' => 'Mechanical Division'
             ],
-             [
+            [
                 'name' => 'Civil',
-                'code' => 'Civ',
+                'code' => 'civ',
                 'description' => 'Civil Division'
             ],
         ];

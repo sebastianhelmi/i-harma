@@ -18,6 +18,7 @@ class DeliveryPlan extends Model
 
 
     protected $fillable = [
+        'project_id',
         'plan_number',
         'destination',
         'planned_date',
@@ -33,6 +34,11 @@ class DeliveryPlan extends Model
         'planned_date' => 'date',
         'vehicle_count' => 'integer'
     ];
+
+    public function project(): BelongsTo
+    {
+        return $this->belongsTo(Project::class);
+    }
 
     // Relationships
     public function creator(): BelongsTo

@@ -47,6 +47,14 @@ class TaskController extends Controller
         $projects = Project::where('manager_id', Auth::id())
             ->pluck('name', 'id');
 
+        // Get project files
+        $projectFiles = Project::where('manager_id', Auth::id())
+            ->get()
+            ->mapWithKeys(function ($project) {
+                // No need to decode since it's already an array
+                return [$project->id => $project->files ?? []];
+            });
+
         $divisionHeads = User::whereHas('role', function ($q) {
             $q->where('name', 'Kepala Divisi');
         })->pluck('name', 'id');
@@ -58,15 +66,12 @@ class TaskController extends Controller
         $parentTask = null;
         if ($request->parent_id) {
             $parentTask = Task::findOrFail($request->parent_id);
-            // Verify parent task belongs to a project managed by current user
             if ($parentTask->project->manager_id !== Auth::id()) {
                 abort(403);
             }
-            // Set project_id from parent task
             $project_id = $parentTask->project_id;
         }
 
-        // If project_id is provided, verify it belongs to current user
         if ($project_id) {
             $project = Project::findOrFail($project_id);
             if ($project->manager_id !== Auth::id()) {
@@ -74,10 +79,7 @@ class TaskController extends Controller
             }
         }
 
-        // Initialize parentTasks as empty collection
         $parentTasks = collect();
-
-        // If we have a project_id, get possible parent tasks
         if ($project_id) {
             $parentTasks = Task::where('project_id', $project_id)
                 ->whereNull('parent_task_id')
@@ -89,7 +91,8 @@ class TaskController extends Controller
             'divisionHeads',
             'parentTask',
             'project_id',
-            'parentTasks'
+            'parentTasks',
+            'projectFiles'  // Add this line
         ));
     }
     public function store(Request $request)
@@ -97,6 +100,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'drawing_file' => 'nullable|string', // Add this line - we'll get it from project files
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'required|exists:users,id',
             'due_date' => 'required|date|after:today',
@@ -123,6 +127,37 @@ class TaskController extends Controller
             ->with('success', 'Task created successfully.');
     }
 
+    public function update(Request $request, Task $task)
+    {
+        // Verify project belongs to current manager
+        if ($task->project->manager_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'drawing_file' => 'nullable|string', // Add this line
+            'project_id' => 'required|exists:projects,id',
+            'assigned_to' => 'required|exists:users,id',
+            'due_date' => 'required|date',
+            'status' => 'required|in:pending,in_progress,completed',
+            'parent_task_id' => 'nullable|exists:tasks,id'
+        ]);
+
+        // Verify assigned user is a division head
+        $assignedUser = User::findOrFail($validated['assigned_to']);
+        if (!$assignedUser->isKepalaDivisi()) {
+            return back()->with('error', 'Tasks can only be assigned to Division Heads.');
+        }
+
+        $task->update($validated);
+
+        return redirect()
+            ->route('pm.tasks.index')
+            ->with('success', 'Task updated successfully.');
+    }
+
     public function edit(Task $task)
     {
         // Verify project belongs to current manager
@@ -145,35 +180,6 @@ class TaskController extends Controller
         return view('pm.tasks.edit', compact('task', 'projects', 'divisionHeads', 'parentTasks'));
     }
 
-    public function update(Request $request, Task $task)
-    {
-        // Verify project belongs to current manager
-        if ($task->project->manager_id !== Auth::id()) {
-            abort(403);
-        }
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'project_id' => 'required|exists:projects,id',
-            'assigned_to' => 'required|exists:users,id',
-            'due_date' => 'required|date',
-            'status' => 'required|in:pending,in_progress,completed',
-            'parent_task_id' => 'nullable|exists:tasks,id'
-        ]);
-
-        // Verify assigned user is a division head
-        $assignedUser = User::findOrFail($validated['assigned_to']);
-        if (!$assignedUser->isKepalaDivisi()) {
-            return back()->with('error', 'Tasks can only be assigned to Division Heads.');
-        }
-
-        $task->update($validated);
-
-        return redirect()
-            ->route('pm.tasks.index')
-            ->with('success', 'Task updated successfully.');
-    }
 
     public function destroy(Task $task)
     {

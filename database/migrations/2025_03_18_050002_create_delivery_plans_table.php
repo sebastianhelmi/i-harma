@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('delivery_plans', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('project_id')->constrained('projects')->onDelete('restrict');
             $table->string('plan_number')->unique(); // Nomor rencana pengiriman
             $table->string('destination'); // Lokasi tujuan
             $table->date('planned_date'); // Tanggal rencana pengiriman

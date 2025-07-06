@@ -25,6 +25,10 @@
         <div class="row g-4">
             <div class="col-md-6">
                 <div class="mb-3">
+                    <label class="form-label text-muted">Project</label>
+                    <p class="mb-0">{{ $plan->project->name ?? '-' }}</p>
+                </div>
+                <div class="mb-3">
                     <label class="form-label text-muted">Nomor Rencana</label>
                     <p class="fw-bold mb-0">{{ $plan->plan_number }}</p>
                 </div>

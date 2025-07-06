@@ -38,10 +38,11 @@
                         <span>Tugas</span>
                     </a>
                 </li>
-                {{-- {{ request()->routeIs('kadiv.reports*') ? 'active' : '' }} --}}
-                {{-- {{ route('kadiv.reports.index') }} --}}
-                <li class="">
-                    <a href="" class="reports-link">
+
+                <li class="{{ request()->routeIs('head-of-division.reports*') ? 'active' : '' }}">
+                    <a href="{{ route('head-of-division.reports.index') }}" class="reports-link">
+                        {{-- {{ request()->routeIs('kadiv.reports*') ? 'active' : '' }} --}}
+                        {{-- {{ route('kadiv.reports.index') }} --}}
                         <i class="fas fa-chart-line"></i>
                         <span>Laporan</span>
                     </a>
@@ -52,8 +53,22 @@
                         <span>SPB</span>
                     </a>
                 </li>
-                {{-- {{ request()->routeIs('kadiv.settings*') ? 'active' : '' }} --}}
-                {{-- {{ route('kadiv.settings.index') }} --}}
+                @if(auth()->user()->division_id === 3) {{-- Civil Division ID --}}
+                <li class="{{ request()->routeIs('head-of-division.delivery-confirmations*') ? 'active' : '' }}">
+                    <a href="{{ route('head-of-division.delivery-confirmations.index') }}">
+                        <i class="fas fa-truck"></i>
+                        <span>Konfirmasi Pengiriman</span>
+                        @php
+                        $pendingCount = \App\Models\DeliveryPlan::where('status', 'shipping')->count();
+                        @endphp
+                        @if($pendingCount > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $pendingCount }}
+                        </span>
+                        @endif
+                    </a>
+                </li>
+                @endif
                 <li class="">
                     <a href="">
                         <i class="fas fa-cog"></i>
@@ -110,7 +125,7 @@
                         <!-- User Profile -->
                         <div class="dropdown profile">
                             <button class="btn d-flex align-items-center" data-bs-toggle="dropdown">
-                                <img src="https://ui-avatars.com/api/?name=div class="rounded-circle me-2"
+                                <img src="https://ui-avatars.com/api/?name=div class=" rounded-circle me-2"
                                     alt="Profile">
                                 <div class="d-none d-md-block text-start">
                                     <div class="fw-medium">{{ auth()->user()->name }}</div>
@@ -155,25 +170,25 @@
 
     @stack('scripts')
     @if (session('success'))
-        <script type="module">
-            Swal.fire({
+    <script type="module">
+        Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
             });
-        </script>
+    </script>
     @endif
 
     @if (session('error'))
-        <script type="module">
-            Swal.fire({
+    <script type="module">
+        Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}"
             });
-        </script>
+    </script>
     @endif
 </body>
 

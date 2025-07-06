@@ -45,6 +45,13 @@
                         <span>SPB</span>
                     </a>
                 </li>
+                <li class="{{ request()->routeIs('pm.riwayat*') ? 'active' : '' }}">
+                    <a href="{{ route('pm.riwayat.index') }}">
+                        <i class="fas fa-history"></i>
+                        <span>Riwayat Pengadaan</span>
+                    </a>
+                </li>
+
                 {{-- {{ request()->routeIs('pm.reports*') ? 'active' : '' }} --}}
                 <li class="">
                     {{-- {{ route('pm.reports.index') }} --}}

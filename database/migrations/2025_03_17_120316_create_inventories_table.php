@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('item_category_id')->constrained('item_categories')->onDelete('restrict'); // Relasi ke kategori item
             $table->string('unit'); // Satuan barang (pcs, kg, liter, dll.)
             $table->decimal('unit_price', 15, 2)->nullable(); // Harga satuan
+            $table->decimal('weight', 10, 2)->nullable()->comment('Berat dalam kg');
             $table->foreignId('added_by')->constrained('users')->onDelete('cascade'); // User yang menambahkan stok
             $table->timestamps();
         });

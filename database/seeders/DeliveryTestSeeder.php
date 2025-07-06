@@ -10,6 +10,7 @@ use App\Models\Spb;
 use App\Models\SiteSpb;
 use App\Models\Po;
 use App\Models\PoItem;
+use App\Models\ProcurementHistory;
 use App\Models\Supplier;
 use App\Models\Task;
 use App\Models\WorkshopOutput;
@@ -110,7 +111,7 @@ class DeliveryTestSeeder extends Seeder
                     'start_date' => now(),
                     'end_date' => now()->addMonths(6),
                     'status' => $project['status'],
-                    'manager_id' => $deliveryStaff->id
+                    'manager_id' => 1
                 ]
             );
 
@@ -243,8 +244,79 @@ class DeliveryTestSeeder extends Seeder
                     'quantity' => ($index + 1) * 10,
                     'information' => 'Diperlukan untuk konstruksi'
                 ]);
+                ProcurementHistory::create([
+                    'spb_id' => $siteSPB->id,
+                    'document_type' => 'spb',
+                    'document_number' => $siteSPB->spb_number,
+                    'status' => 'approved',
+                    'actor' => $deliveryStaff->id,
+                    'description' => "SPB Site untuk {$project->name} telah dibuat dan disetujui"
+                ]);
             }
         }
+
+        // Create PO for site SPB
+        $po = Po::create([
+            'po_number' => 'PO' . now()->format('Ymd') . sprintf('%03d', rand(1, 999)),
+            'order_date' => now(),
+            'supplier_id' => $defaultSupplier->id,
+            'company_name' => $defaultSupplier->name,
+            'spb_id' => $siteSPB->id,
+            'created_by' => $deliveryStaff->id,
+            'status' => 'completed',
+            'total_amount' => 0 // Will be calculated later
+        ]);
+
+        // Create PO Items and update total
+        $totalAmount = 0;
+        foreach ($inventoryItems as $item) {
+            $amount = $item->unit_price * (($index + 1) * 10);
+            $totalAmount += $amount;
+
+            PoItem::create([
+                'po_id' => $po->id,
+                'item_name' => $item->item_name,
+                'spb_id' => $siteSPB->id,
+                'quantity' => ($index + 1) * 10,
+                'unit' => $item->unit,
+                'unit_price' => $item->unit_price,
+                'total_price' => $amount
+            ]);
+        }
+
+        // Update PO total
+        $po->update(['total_amount' => $totalAmount]);
+
+        // Create procurement history for PO
+        ProcurementHistory::create([
+            'po_id' => $po->id,
+            'document_type' => 'po',
+            'document_number' => $po->po_number,
+            'status' => 'ordered',
+            'actor' => $deliveryStaff->id,
+            'description' => "PO untuk SPB {$siteSPB->spb_number} telah dibuat"
+        ]);
+
+        // Create various status histories
+        $statuses = [
+            ['status' => 'pending', 'desc' => 'SPB menunggu persetujuan'],
+            ['status' => 'approved', 'desc' => 'SPB telah disetujui'],
+            ['status' => 'ordered', 'desc' => 'PO telah dibuat'],
+            ['status' => 'completed', 'desc' => 'Barang telah diterima']
+        ];
+
+        foreach ($statuses as $status) {
+            ProcurementHistory::create([
+                'spb_id' => $siteSPB->id,
+                'document_type' => 'spb',
+                'document_number' => $siteSPB->spb_number,
+                'status' => $status['status'],
+                'actor' => $deliveryStaff->id,
+                'description' => $status['desc'],
+                'created_at' => now()->subHours(rand(1, 24)) // Random time within last 24 hours
+            ]);
+        }
+
 
         // Output success message
         $this->command->info('Test data berhasil dibuat:');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\ProjectManager;
 
 use App\Http\Controllers\Controller;
+use App\Models\ProcurementHistory;
 use App\Models\Spb;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,14 @@ class SpbApprovalController extends Controller
             'approved_at' => now(),
             'status_po' => 'pending', // Set for Purchasing review
             'remarks' => $request->remarks
+        ]);
+        ProcurementHistory::create([
+            'spb_id' => $spb->id,
+            'document_type' => 'spb',
+            'document_number' => $spb->spb_number,
+            'status' => 'approved',
+            'actor' => Auth::id(),
+            'description' => 'SPB telah disetujui'
         ]);
 
         return redirect()

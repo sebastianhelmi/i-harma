@@ -15,7 +15,12 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // Nama tugas
             $table->text('description')->nullable(); // Deskripsi tugas
+            $table->string('drawing_file');
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade'); // Relasi ke proyek
+            $table->foreignId('division_id')
+                ->nullable()
+                ->constrained('divisions')
+                ->nullOnDelete();
             $table->foreignId('assigned_to')->nullable()->constrained('users')->onDelete('set null'); // Ditugaskan ke siapa
             $table->date('due_date')->nullable(); // Deadline tugas
             $table->enum('status', ['pending', 'in_progress', 'completed'])->default('pending'); // Status tugas

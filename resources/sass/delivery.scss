@@ -24,7 +24,8 @@ html, body {
 // Sidebar Styles
 .sidebar {
     width: var(--sidebar-width);
-    background: #ffffff;
+    background: var(--delivery-primary); // biru utama
+    color: #fff;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
     position: fixed;
     height: 100vh;
@@ -33,7 +34,7 @@ html, body {
 
     .sidebar-header {
         padding: 1.5rem;
-        background: #f4f4f5;
+        background: #1f54c7; // 5% lebih gelap dari #2563eb
         border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         display: flex;
         align-items: center;
@@ -47,7 +48,7 @@ html, body {
         .company-name {
             font-size: 1.125rem;
             font-weight: 600;
-            color: #1e293b;
+            color: #fff;
         }
     }
 
@@ -61,7 +62,7 @@ html, body {
                 padding: 0.75rem 1.5rem;
                 display: flex;
                 align-items: center;
-                color: #64748b;
+                color: #fff; // teks putih
                 text-decoration: none;
                 transition: all 0.2s ease;
                 border-left: 3px solid transparent;
@@ -70,6 +71,7 @@ html, body {
                     width: 20px;
                     margin-right: 0.75rem;
                     font-size: 1.125rem;
+                    color: #fff; // icon putih
                 }
 
                 span {
@@ -77,15 +79,15 @@ html, body {
                 }
 
                 &:hover {
-                    color: var(--delivery-primary);
-                    background: rgba(37, 99, 235, 0.08);
+                    color: #fff;
+                    background: rgba(255,255,255,0.08);
                 }
             }
 
             &.active > a {
-                color: var(--delivery-primary);
-                background: rgba(37, 99, 235, 0.08);
-                border-left-color: var(--delivery-primary);
+                color: #fff;
+                background: rgba(255,255,255,0.16);
+                border-left-color: #fff;
                 font-weight: 500;
             }
         }

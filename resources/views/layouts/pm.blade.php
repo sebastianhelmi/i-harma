@@ -15,7 +15,7 @@
         <nav id="sidebar" class="sidebar">
             <div class="sidebar-header">
                 <img src="{{ asset('images/logo.png') }}" alt="Logo" class="logo">
-                <span class="company-name">Company Name</span>
+                <span class="company-name">Project Manager</span>
             </div>
 
             <ul class="list-unstyled components">

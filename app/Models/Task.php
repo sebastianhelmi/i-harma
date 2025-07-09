@@ -40,6 +40,10 @@ class Task extends Model
         'parent_task_id',
     ];
 
+    protected $casts = [
+        'due_date' => 'date',
+    ];
+
     public function getDrawingUrl()
     {
         return $this->drawing_file ? asset('storage/' . $this->drawing_file) : null;

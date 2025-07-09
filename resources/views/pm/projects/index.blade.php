@@ -74,7 +74,7 @@
                         <tbody>
                             @forelse($projects as $project)
                                 <tr>
-                                    <td>{{ $project->name }}</td>
+                                    <td><a href="{{ route('pm.projects.show', $project) }}">{{ $project->name }}</a></td>
                                     <td>{{ $project->client_name }}</td>
                                     <td>{{ $project->project_location }}</td>
                                     <td>{{ $project->description }}</td>

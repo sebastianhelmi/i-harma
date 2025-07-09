@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Support\Str;
 
 class ProjectController extends Controller
 {
@@ -139,6 +142,18 @@ class ProjectController extends Controller
             ->with('success', 'Project updated successfully.');
     }
 
+    public function show(Project $project)
+    {
+        // Check if user can view this project
+        if (! Gate::allows('view', $project)) {
+            abort(403);
+        }
+
+        $project->load(['tasks.subtasks']);
+
+        return view('pm.projects.show', compact('project'));
+    }
+
     public function destroy(Project $project)
     {
         // Check if user can delete this project
@@ -163,5 +178,75 @@ class ProjectController extends Controller
         return redirect()
             ->route('pm.projects.index')
             ->with('success', 'Project deleted successfully.');
+    }
+
+    public function exportExcel(Project $project)
+    {
+        if ($project->status !== 'completed') {
+            abort(403, 'Project must be completed to export S-Curve.');
+        }
+
+        $project->load(['tasks.subtasks']);
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Set header
+        $headers = ['DESCRIPTION', 'VOL.', 'UNIT', 'VALUE'];
+        for ($i = 1; $i <= 52; $i++) {
+            $headers[] = 'W' . $i;
+        }
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        $row = 2;
+        $mainTasksCount = $project->tasks->whereNull('parent_task_id')->count();
+
+        foreach ($project->tasks as $task) {
+            if ($task->parent_task_id === null) {
+                // Main Task
+                $mainTaskWeight = $mainTasksCount > 0 ? 100 / $mainTasksCount : 0;
+                $taskRow = [
+                    $task->name,
+                    '', // VOL.
+                    '', // UNIT
+                    number_format($mainTaskWeight, 2) . '%', // VALUE
+                ];
+
+                // Add progress for each week (simplified: 100% if completed, 0% otherwise)
+                for ($i = 1; $i <= 52; $i++) {
+                    $taskRow[] = $task->status === 'completed' ? number_format($mainTaskWeight, 2) . '%' : '';
+                }
+                $sheet->fromArray($taskRow, NULL, 'A' . $row++);
+
+                // Subtasks
+                $subtasks = $task->subtasks;
+                if ($subtasks->count() > 0) {
+                    $subtaskWeight = $mainTaskWeight / $subtasks->count();
+                    foreach ($subtasks as $subtask) {
+                        $subtaskRow = [
+                            ' - ' . $subtask->name,
+                            '', // VOL.
+                            '', // UNIT
+                            number_format($subtaskWeight, 2) . '%', // VALUE
+                        ];
+                        for ($i = 1; $i <= 52; $i++) {
+                            $subtaskRow[] = $subtask->status === 'completed' ? number_format($subtaskWeight, 2) . '%' : '';
+                        }
+                        $sheet->fromArray($subtaskRow, NULL, 'A' . $row++);
+                    }
+                }
+            }
+        }
+
+        // Set total percentage
+        $sheet->setCellValue('A' . $row, 'Total Percentage');
+        $sheet->setCellValue('D' . $row, '100%');
+
+        $writer = new Xlsx($spreadsheet);
+        $filename = 'S-Curve-' . Str::slug($project->name) . '.xlsx';
+        $tempFile = tempnam(sys_get_temp_dir(), $filename);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
     }
 }

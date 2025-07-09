@@ -13,6 +13,7 @@ Route::middleware(['auth', 'role:Project Manager'])->prefix('pm')->name('pm.')->
     })->name('dashboard');
 
     Route::resource('projects', ProjectController::class);
+    Route::get('projects/{project}/export-excel', [ProjectController::class, 'exportExcel'])->name('projects.export-excel');
     Route::get('/spb', function () {
         return view('pm.spb');
     })->name('spb');
@@ -29,4 +30,5 @@ Route::middleware(['auth', 'role:Project Manager'])->prefix('pm')->name('pm.')->
         ->name('riwayat.index');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
 });

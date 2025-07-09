@@ -32,7 +32,12 @@
                         <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary">Filter</button>
+                        <button type="submit" class="btn btn-primary me-2">Filter</button>
+                        @if(request()->has('start_date') && request()->has('end_date'))
+                            <a href="{{ route('pm.reports.export-excel', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" class="btn btn-success">
+                                <i class="fas fa-file-excel me-2"></i>Export Excel
+                            </a>
+                        @endif
                     </div>
                 </form>
             </div>

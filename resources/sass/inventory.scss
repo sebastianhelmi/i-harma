@@ -85,6 +85,9 @@ body {
 
 // Header
 .header {
+    z-index: 1055;
+    position: sticky;
+    top: 0;
     height: 64px;
     background-color: white;
     border-bottom: 1px solid $gray-200;
@@ -92,8 +95,6 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 0 1.5rem;
-    position: sticky;
-    top: 0;
 }
 
 .search-box {
@@ -194,3 +195,4 @@ body {
         display: none;
     }
 }
+

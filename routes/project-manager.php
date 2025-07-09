@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProjectManager\ProcurementHistoryController;
+use App\Http\Controllers\ProjectManager\ReportController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectManager\SpbApprovalController;
 use App\Http\Controllers\TaskController;
@@ -26,4 +27,6 @@ Route::middleware(['auth', 'role:Project Manager'])->prefix('pm')->name('pm.')->
 
      Route::get('/riwayat-pengadaan', [ProcurementHistoryController::class, 'index'])
         ->name('riwayat.index');
+
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 });

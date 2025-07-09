@@ -32,9 +32,14 @@ class SpbController extends Controller
             })
             ->latest('spb_date');
 
-        $spbs = $query->paginate(10);
+        $spbs = $query->paginate(10, ['*'], 'pending_page');
 
-        return view('purchasing.spbs.index', compact('spbs'));
+        $spbHistories = Spb::with(['project', 'requester', 'task', 'itemCategory', 'po'])
+            ->where('status_po', 'completed')
+            ->latest('updated_at')
+            ->paginate(10, ['*'], 'history_page');
+
+        return view('purchasing.spbs.index', compact('spbs', 'spbHistories'));
     }
 
     public function show(Spb $spb)

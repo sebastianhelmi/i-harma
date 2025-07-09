@@ -124,6 +124,18 @@ class DeliveryNoteController extends Controller
         }
     }
 
+    public function show(DeliveryNote $note)
+    {
+        $note->load([
+            'deliveryPlan.project',
+            'deliveryPlan.draftItems',
+            'document',
+            'creator'
+        ]);
+
+        return view('delivery.notes.show', compact('note'));
+    }
+
     public function print(DeliveryNote $note)
     {
         $note->load([

@@ -26,6 +26,9 @@
 
     <!-- SPB Table -->
     <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Menunggu Persetujuan</h5>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover align-middle">
@@ -83,6 +86,64 @@
 
             <div class="mt-4">
                 {{ $spbs->links() }}
+            </div>
+        </div>
+    </div>
+
+    <!-- SPB History -->
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Riwayat Persetujuan SPB</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>No. SPB</th>
+                            <th>Proyek</th>
+                            <th>Tanggal Disetujui/Ditolak</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($spbHistories as $spb)
+                            <tr>
+                                <td>{{ $spb->spb_number }}</td>
+                                <td>
+                                    <a href="{{ route('pm.projects.show', $spb->project_id) }}">
+                                        {{ $spb->project->name }}
+                                    </a>
+                                </td>
+                                <td>{{ $spb->approved_at ? $spb->approved_at->format('d/m/Y') : 'N/A' }}</td>
+                                <td>
+                                    <span class="badge bg-{{ $spb->getStatusBadgeClass() }}">
+                                        {{ ucfirst($spb->status) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="{{ route('pm.spb-approvals.show', $spb) }}"
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center py-4">
+                                    Tidak ada riwayat persetujuan SPB.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                {{ $spbHistories->links() }}
             </div>
         </div>
     </div>

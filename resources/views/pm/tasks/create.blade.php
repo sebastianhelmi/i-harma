@@ -59,9 +59,9 @@
                                 <label class="form-label required">Drawing File</label>
                                 <input type="hidden" name="drawing_file" id="selected_drawing">
                                 <div class="input-group">
-                                    <input type="text" class="form-control" id="drawing_preview" readonly
+                                    <input type="text" class="form-control @error('drawing_file') is-invalid @enderror" id="drawing_preview" readonly
                                         placeholder="Select drawing from project files" value="{{ old('drawing_file') }}">
-                                    <button class="btn btn-outline-secondary" type="button" id="selectDrawingBtn" disabled>
+                                    <button class="btn btn-outline-secondary @error('drawing_file') is-invalid @enderror" type="button" id="selectDrawingBtn" disabled>
                                         <i class="fas fa-image me-1"></i>Select Drawing
                                     </button>
                                 </div>

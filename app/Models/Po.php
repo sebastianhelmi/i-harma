@@ -44,6 +44,15 @@ class Po extends Model
         return $this->hasMany(PoItem::class);
     }
 
+    public function getStatusBadgeClass()
+    {
+        return match($this->status) {
+            'pending' => 'warning',
+            'completed' => 'success',
+            'cancelled' => 'danger',
+        };
+    }
+
     public static function generatePoNumber()
     {
         $prefix = 'PO-' . date('Ym-');

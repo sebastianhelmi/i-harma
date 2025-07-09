@@ -3,6 +3,7 @@
 use App\Http\Controllers\Inventory\InventoryController;
 use App\Http\Controllers\Inventory\OutgoingController;
 use App\Http\Controllers\Inventory\ReceivedGoodsController;
+use App\Http\Controllers\Inventory\ReportController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('inventory.')->group(function () {
@@ -29,9 +30,7 @@ Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('invent
     Route::get('/outgoing/{transaction}', [OutgoingController::class, 'show'])->name('outgoing.show');
     Route::get('/outgoing/export', [OutgoingController::class, 'export'])->name('outgoing.export');
 
-    Route::get('/reports', function () {
-        return view('inventory.reports');
-    })->name('reports');
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 
     Route::get('/settings', function () {
         return view('inventory.settings');

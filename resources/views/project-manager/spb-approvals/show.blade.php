@@ -16,18 +16,20 @@
             </nav>
         </div>
         <div class="d-flex gap-2">
-            <button type="button"
-                    class="btn btn-success"
-                    data-bs-toggle="modal"
-                    data-bs-target="#approveModal">
-                <i class="fas fa-check me-2"></i>Setujui
-            </button>
-            <button type="button"
-                    class="btn btn-danger"
-                    data-bs-toggle="modal"
-                    data-bs-target="#rejectModal">
-                <i class="fas fa-times me-2"></i>Tolak
-            </button>
+            @if($spb->status === 'pending')
+                <button type="button"
+                        class="btn btn-success"
+                        data-bs-toggle="modal"
+                        data-bs-target="#approveModal">
+                    <i class="fas fa-check me-2"></i>Setujui
+                </button>
+                <button type="button"
+                        class="btn btn-danger"
+                        data-bs-toggle="modal"
+                        data-bs-target="#rejectModal">
+                    <i class="fas fa-times me-2"></i>Tolak
+                </button>
+            @endif
             <a href="{{ route('pm.spb-approvals.index') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Kembali
             </a>

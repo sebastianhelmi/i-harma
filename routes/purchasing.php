@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Purchasing\PoController;
+use App\Http\Controllers\Purchasing\ReportController;
 use App\Http\Controllers\Purchasing\SpbController;
 use App\Http\Controllers\Purchasing\SupplierController;
 use Illuminate\Support\Facades\Route;
@@ -28,9 +29,7 @@ Route::middleware(['auth', 'role:Purchasing'])->prefix('purchasing')->name('purc
         return view('purchasing.orders.index');
     })->name('orders.index');
     Route::resource('suppliers', SupplierController::class);
-    Route::get('reports', function () {
-        return view('purchasing.reports');
-    })->name('reports');
+    Route::get('reports', [ReportController::class, 'index'])->name('reports.index');
     Route::get('settings', function () {
         return view('purchasing.settings');
     })->name('settings');

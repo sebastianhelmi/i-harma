@@ -64,6 +64,9 @@
 
         <!-- SPB Table -->
         <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0">SPB Menunggu Proses PO</h5>
+            </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
@@ -143,7 +146,78 @@
                 </div>
 
                 <div class="mt-4">
-                    {{ $spbs->links() }}
+                    {{ $spbs->appends(request()->query())->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        </div>
+
+        <!-- SPB History -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Riwayat SPB yang Telah di-PO</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead>
+                            <tr>
+                                <th>No. SPB</th>
+                                <th>No. PO</th>
+                                <th>Tanggal PO</th>
+                                <th>Proyek</th>
+                                <th>Status PO</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @forelse($spbHistories as $spb)
+                                <tr>
+                                    <td>{{ $spb->spb_number }}</td>
+                                    <td>
+                                        @if($spb->po)
+                                            <a href="{{ route('purchasing.pos.show', $spb->po->id) }}">{{ $spb->po->po_number }}</a>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>{{ $spb->po ? $spb->po->po_date->format('d/m/Y') : '-' }}</td>
+                                    <td>{{ $spb->project->name }}</td>
+                                    <td>
+                                        <span class="badge bg-success">
+                                            {{ ucfirst($spb->status_po) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="{{ route('purchasing.spbs.show', $spb) }}" class="btn btn-sm btn-info"
+                                                title="Lihat Detail SPB">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            @if($spb->po)
+                                                <a href="{{ route('purchasing.pos.show', $spb->po->id) }}" class="btn btn-sm btn-primary"
+                                                    title="Lihat Detail PO">
+                                                    <i class="fas fa-file-invoice"></i>
+                                                </a>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-history fa-2x mb-3"></i>
+                                            <p class="mb-0">Belum ada riwayat SPB yang di-PO.</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforelse
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="mt-4">
+                    {{ $spbHistories->appends(request()->query())->links('pagination::bootstrap-5') }}
                 </div>
             </div>
         </div>

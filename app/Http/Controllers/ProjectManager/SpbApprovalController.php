@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Auth;
 
 class SpbApprovalController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $spbs = Spb::with(['project', 'requester', 'task', 'itemCategory'])
             ->whereHas('project', function ($query) {
@@ -18,9 +18,17 @@ class SpbApprovalController extends Controller
             })
             ->where('status', 'pending')
             ->latest('spb_date')
-            ->paginate(10);
+            ->paginate(10, ['*'], 'pending_page');
 
-        return view('project-manager.spb-approvals.index', compact('spbs'));
+        $spbHistories = Spb::with(['project', 'requester', 'task', 'itemCategory'])
+            ->whereHas('project', function ($query) {
+                $query->where('manager_id', Auth::id());
+            })
+            ->whereIn('status', ['approved', 'rejected'])
+            ->latest('approved_at')
+            ->paginate(10, ['*'], 'history_page');
+
+        return view('project-manager.spb-approvals.index', compact('spbs', 'spbHistories'));
     }
 
     public function show(Spb $spb)

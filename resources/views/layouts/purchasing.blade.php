@@ -47,8 +47,8 @@
                     <span>Suppliers</span>
                 </a>
 
-                <a href="{{ route('purchasing.reports') }}"
-                    class="nav-item {{ request()->routeIs('purchasing.reports') ? 'active' : '' }}">
+                <a href="{{ route('purchasing.reports.index') }}"
+                    class="nav-item {{ request()->routeIs('purchasing.reports.index') ? 'active' : '' }}">
                     <i class="icon" data-lucide="file-text"></i>
                     <span>Reports</span>
                 </a>

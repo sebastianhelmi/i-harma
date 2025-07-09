@@ -100,7 +100,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'drawing_file' => 'nullable|string', // Add this line - we'll get it from project files
+            'drawing_file' => 'required|string', // Add this line - we'll get it from project files
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'required|exists:users,id',
             'due_date' => 'required|date|after:today',
@@ -137,7 +137,7 @@ class TaskController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'drawing_file' => 'nullable|string', // Add this line
+            'drawing_file' => 'required|string', // Add this line
             'project_id' => 'required|exists:projects,id',
             'assigned_to' => 'required|exists:users,id',
             'due_date' => 'required|date',

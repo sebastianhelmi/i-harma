@@ -42,6 +42,7 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
     Route::prefix('notes')->name('notes.')->group(function () {
         Route::get('/create/{plan}', [DeliveryNoteController::class, 'create'])->name('create');
         Route::post('/{plan}', [DeliveryNoteController::class, 'store'])->name('store');
+        Route::get('/{note}', [DeliveryNoteController::class, 'show'])->name('show');
         Route::get('/{plan}/items/create', [DeliveryPlanItemController::class, 'create'])->name('items.create');
         Route::get('/{note}/print', [DeliveryNoteController::class, 'print'])->name('print');
     });
@@ -58,19 +59,19 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
     //     Route::post('/{shipment}/proof', [ShipmentController::class, 'uploadProof'])->name('upload-proof');
     // });
 
-    // // Delivery History (Riwayat Pengiriman)
-    // Route::prefix('history')->name('history.')->group(function () {
-    //     Route::get('/', [HistoryController::class, 'index'])->name('index');
-    //     Route::get('/{shipment}', [HistoryController::class, 'show'])->name('show');
-    //     Route::get('/export', [HistoryController::class, 'export'])->name('export');
-    // });
+    // Delivery History (Riwayat Pengiriman)
+    Route::prefix('history')->name('history.')->group(function () {
+        Route::get('/', [HistoryController::class, 'index'])->name('index');
+        Route::get('/{shipment}', [HistoryController::class, 'show'])->name('show');
+        Route::get('/export', [HistoryController::class, 'export'])->name('export');
+    });
 
-    // // Reports (Laporan)
-    // Route::prefix('reports')->name('reports.')->group(function () {
-    //     Route::get('/', [ReportController::class, 'index'])->name('index');
-    //     Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
-    //     Route::get('/download/{report}', [ReportController::class, 'download'])->name('download');
-    // });
+    // Reports (Laporan)
+    Route::prefix('reports')->name('reports.')->group(function () {
+        Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
+        Route::get('/download/{report}', [ReportController::class, 'download'])->name('download');
+    });
 
     // Profile
     Route::get('/profile', function () {

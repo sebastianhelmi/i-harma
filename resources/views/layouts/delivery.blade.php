@@ -41,19 +41,18 @@
                     </a>
                 </li> --}}
 
-                {{-- <li class="{{ request()->routeIs('delivery.history*') ? 'active' : '' }}">
+                <li class="{{ request()->routeIs('delivery.history*') ? 'active' : '' }}">
                     <a href="{{ route('delivery.history.index') }}">
                         <i class="fas fa-history"></i>
                         <span>Riwayat Pengiriman</span>
                     </a>
                 </li>
-
                 <li class="{{ request()->routeIs('delivery.reports*') ? 'active' : '' }}">
                     <a href="{{ route('delivery.reports.index') }}">
                         <i class="fas fa-chart-bar"></i>
                         <span>Laporan</span>
                     </a>
-                </li> --}}
+                </li>
             </ul>
         </nav>
 
@@ -146,25 +145,25 @@
 
     <!-- Flash Messages -->
     @if (session('success'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
             });
-    </script>
+        </script>
     @endif
 
     @if (session('error'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}"
             });
-    </script>
+        </script>
     @endif
 
     <script>

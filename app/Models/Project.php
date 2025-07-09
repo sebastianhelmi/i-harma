@@ -34,6 +34,12 @@ class Project extends Model
     {
         return $this->hasMany(Task::class);
     }
+
+    public function spbs()
+    {
+        return $this->hasMany(Spb::class);
+    }
+
     public function getStatusBadgeClass()
     {
         return match ($this->status) {

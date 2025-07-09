@@ -48,8 +48,8 @@
                     <span>Outgoing</span>
                 </a>
 
-                <a href="{{ route('inventory.reports') }}"
-                    class="nav-item {{ request()->routeIs('inventory.reports') ? 'active' : '' }}">
+                <a href="{{ route('inventory.reports.index') }}"
+                    class="nav-item {{ request()->routeIs('inventory.reports.index') ? 'active' : '' }}">
                     <i class="icon" data-lucide="file-bar-chart"></i>
                     <span>Reports</span>
                 </a>
@@ -119,25 +119,25 @@
     </script>
     @stack('scripts')
     @if (session('success'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
             });
-    </script>
+        </script>
     @endif
 
     @if (session('error'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}"
             });
-    </script>
+        </script>
     @endif
 </body>
 

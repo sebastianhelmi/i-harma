@@ -52,10 +52,8 @@
                     </a>
                 </li>
 
-                {{-- {{ request()->routeIs('pm.reports*') ? 'active' : '' }} --}}
-                <li class="">
-                    {{-- {{ route('pm.reports.index') }} --}}
-                    <a href="">
+                <li class="{{ request()->routeIs('pm.reports*') ? 'active' : '' }}">
+                    <a href="{{ route('pm.reports.index') }}">
                         <i class="fas fa-chart-bar"></i>
                         <span>Laporan</span>
                     </a>

@@ -57,9 +57,9 @@ class TaskController extends Controller
     }
 
 
-      public function show($id)
+    public function show($id)
     {
-        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo', 'spb'])
+        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo', 'spb', 'workshopOutputs.workshopSpb'])
             ->findOrFail($id);
 
         // Check if task is assigned to current user
@@ -74,8 +74,8 @@ class TaskController extends Controller
         // - Task is not completed
         // - No existing SPB for this task
         $canCreateSpb = $task->project_id &&
-                        $task->status !== 'completed' &&
-                        !$task->spb()->exists();
+            $task->status !== 'completed' &&
+            !$task->spb()->exists();
 
         return view('head-of-division.tasks.show', compact('task', 'canCreateSpb'));
     }
@@ -87,7 +87,7 @@ class TaskController extends Controller
 
         return view('head-of-division.tasks.create', compact('task'));
     }
-     public function getProjectTasks(Project $project)
+    public function getProjectTasks(Project $project)
     {
         // Verify user has access to this project's tasks
         if (!$project->tasks()->where('assigned_to', Auth::id())->exists()) {
@@ -99,11 +99,11 @@ class TaskController extends Controller
         // Get all tasks (including subtasks) assigned to current user in this project
         $tasks = Task::where('project_id', $project->id)
             ->where('assigned_to', Auth::id())
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereNull('parent_task_id')  // Get parent tasks
-                      ->orWhereHas('parentTask', function($q) {  // Get subtasks where parent is assigned to user
-                          $q->where('assigned_to', Auth::id());
-                      });
+                    ->orWhereHas('parentTask', function ($q) {  // Get subtasks where parent is assigned to user
+                        $q->where('assigned_to', Auth::id());
+                    });
             })
             ->select('id', 'name', 'due_date', 'status', 'parent_task_id')
             ->with(['parentTask:id,name'])
@@ -120,7 +120,7 @@ class TaskController extends Controller
                     'name' => $taskName,
                     'due_date' => $task->due_date,
                     'status' => $task->status,
-                    'status_label' => match($task->status) {
+                    'status_label' => match ($task->status) {
                         'pending' => 'Pending',
                         'in_progress' => 'Sedang Dikerjakan',
                         'completed' => 'Selesai',
@@ -131,7 +131,7 @@ class TaskController extends Controller
         return response()->json($tasks);
     }
 
-        public function complete(Request $request, $id)
+    public function complete(Request $request, $id)
     {
         try {
             $task = Task::with(['spb'])->findOrFail($id);
@@ -170,10 +170,17 @@ class TaskController extends Controller
                             'added_by' => Auth::id()
                         ]);
 
+                        // Find the corresponding workshop SPB item
+                        $workshopSpbItem = $task->spb->workshopItems()
+                            ->where('explanation_items', $output['item_name'])
+                            ->where('unit', $output['unit'])
+                            ->first();
+
                         // Record workshop production output
                         WorkshopOutput::create([
                             'task_id' => $task->id,
                             'spb_id' => $task->spb->id,
+                            'workshop_spb_id' => $workshopSpbItem->id ?? null, // Assign the found workshop_spb_id
                             'inventory_id' => $inventory->id,
                             'quantity_produced' => $output['quantity_produced'],
                             'notes' => $output['notes'] ?? null,
@@ -202,7 +209,6 @@ class TaskController extends Controller
                     return redirect()
                         ->route('head-of-division.tasks.index')
                         ->with('success', 'Tugas workshop berhasil diselesaikan dan hasil produksi telah dicatat.');
-
                 } catch (\Exception $e) {
                     DB::rollBack();
                     throw $e;
@@ -215,7 +221,6 @@ class TaskController extends Controller
             return redirect()
                 ->route('head-of-division.tasks.index')
                 ->with('success', 'Tugas berhasil diselesaikan.');
-
         } catch (\Exception $e) {
             Log::error('Error completing task:', [
                 'task_id' => $id,

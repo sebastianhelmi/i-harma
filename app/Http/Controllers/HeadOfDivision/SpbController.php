@@ -135,6 +135,7 @@ class SpbController extends Controller
         $spb = Spb::create([
             'spb_number' => Spb::generateSpbNumber(),
             'spb_date' => $validated['spb_date'],
+            'estimasi_pakai' => $validated['estimasi_pakai'] ?? null,
             'project_id' => $validated['project_id'],
             'task_id' => $validated['task_id'],
             'item_category_id' => $validated['item_category_id'],
@@ -213,7 +214,28 @@ class SpbController extends Controller
             ->get()
             ->groupBy('inventory_id');
 
-        return view('head-of-division.spbs.show', compact('spb', 'canTakeItems', 'collectedItems'));
+        $inventoryStatus = [];
+        if ($spb->category_entry === 'site') {
+            foreach ($spb->siteItems as $item) {
+                $status = 'default'; // Corresponds to 'Barang Tidak Tersedia' in the view
+
+                // If SPB is approved and PO is completed (or not required)
+                if ($spb->status === 'approved' && ($spb->status_po === 'not_required' || ($spb->po && $spb->po->status === 'completed'))) {
+                    $status = 'waiting_delivery';
+                } else {
+                    // If SPB is not yet approved or PO not completed, check inventory for potential 'insufficient_stock'
+                    $inventory = Inventory::where('item_name', $item->item_name)
+                                        ->where('unit', $item->unit)
+                                        ->first();
+                    if (!$inventory || $inventory->quantity < $item->quantity) {
+                        $status = 'insufficient_stock';
+                    }
+                }
+                $inventoryStatus[$item->id] = ['status' => $status];
+            }
+        }
+
+        return view('head-of-division.spbs.show', compact('spb', 'canTakeItems', 'collectedItems', 'inventoryStatus'));
     }
     public function takeItems(Spb $spb)
     {

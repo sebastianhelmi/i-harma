@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('spb_number')->unique(); // Nomor SPB yang unik
             $table->date('spb_date'); // Tanggal SPB
+            $table->date('estimasi_pakai')->nullable(); // Estimasi tanggal pakai
             $table->foreignId('project_id')->constrained('projects')->onDelete('cascade'); // Relasi ke proyek
             $table->foreignId('requested_by')->constrained('users')->onDelete('cascade'); // User yang mengajukan
             $table->foreignId('task_id')->nullable()->constrained('tasks')->onDelete('set null'); // Relasi ke task

@@ -53,6 +53,16 @@
                             <p class="mb-0">{{ $task->description ?: 'Tidak ada deskripsi' }}</p>
                         </div>
 
+                        @if ($task->drawing_file)
+                            <div class="mb-4">
+                                <h6 class="text-muted mb-2">Gambar Teknis</h6>
+                                <a href="{{ $task->getDrawingUrl() }}" target="_blank">
+                                    <img src="{{ $task->getDrawingUrl() }}" alt="Drawing File"
+                                        class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                                </a>
+                            </div>
+                        @endif
+
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <h6 class="text-muted mb-2">Proyek</h6>

@@ -23,6 +23,7 @@ class Spb extends Model
 
     protected $casts = [
         'spb_date' => 'date',
+        'estimasi_pakai' => 'date',
         'approved_at' => 'datetime'
     ];
 

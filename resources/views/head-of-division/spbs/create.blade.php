@@ -50,6 +50,17 @@
                             </div>
 
                             <div class="col-md-6">
+                                <label class="form-label">Estimasi Tanggal Pakai</label>
+                                <input type="date"
+                                       name="estimasi_pakai"
+                                       class="form-control @error('estimasi_pakai') is-invalid @enderror"
+                                       value="{{ old('estimasi_pakai') }}">
+                                @error('estimasi_pakai')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            <div class="col-md-6">
                                 <label class="form-label required">Proyek</label>
                                 <select name="project_id"
                                         class="form-select @error('project_id') is-invalid @enderror"

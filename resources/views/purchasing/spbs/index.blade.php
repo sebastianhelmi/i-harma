@@ -124,8 +124,8 @@
                                             </a>
                                             @if ($spb->status === 'approved' && $spb->status_po === 'pending')
                                                 <a href="{{ route('purchasing.pos.create', $spb) }}"
-                                                    class="btn btn-sm btn-primary" title="Buat PO">
-                                                    <i class="fas fa-plus"></i> Buat PO
+                                                    class="btn btn-sm btn-primary" title="Cek Item">
+                                                    <i class="fas fa-plus"></i> Cek Item
                                                 </a>
                                             @endif
                                         </div>

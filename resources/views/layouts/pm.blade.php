@@ -59,13 +59,13 @@
                     </a>
                 </li>
                 {{-- {{ request()->routeIs('pm.settings*') ? 'active' : '' }} --}}
-                <li class="">
+                {{-- <li class=""> --}}
                     {{-- {{ route('pm.settings.index') }} --}}
-                    <a href="">
+                    {{-- <a href="">
                         <i class="fas fa-cog"></i>
                         <span>Pengaturan</span>
                     </a>
-                </li>
+                </li> --}}
             </ul>
         </nav>
 

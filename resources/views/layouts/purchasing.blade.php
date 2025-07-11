@@ -53,11 +53,11 @@
                     <span>Reports</span>
                 </a>
 
-                <a href="{{ route('purchasing.settings') }}"
+                {{-- <a href="{{ route('purchasing.settings') }}"
                     class="nav-item {{ request()->routeIs('purchasing.settings') ? 'active' : '' }}">
                     <i class="icon" data-lucide="settings"></i>
                     <span>Settings</span>
-                </a>
+                </a> --}}
             </nav>
         </aside>
 

@@ -32,7 +32,7 @@
 
                 <a href="{{ route('purchasing.spbs.index') }}"
                     class="nav-item {{ request()->routeIs('purchasing.spbs.*') ? 'active' : '' }}">
-                    <i class="fas fa-file-alt"></i>
+                    <i class="icon" data-lucide="file"></i>
                     <span>SPB</span>
                 </a>
                 <a href="{{ route('purchasing.pos.index') }}"

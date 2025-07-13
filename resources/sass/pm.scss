@@ -70,12 +70,12 @@ $topbar-height: 64px;
 
                 &:hover {
                     color: white;
-                    background: rgba(255, 255, 255, 0.1);
+                    background: #1f54cf;
                 }
             }
 
             &.active a {
-                background: #3B82F6;
+                background: #1f54cf;
                 color: white;
             }
         }

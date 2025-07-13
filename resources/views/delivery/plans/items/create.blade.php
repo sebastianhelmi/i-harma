@@ -107,25 +107,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($workshopOutputs as $output)
-                                <tr>
-                                    <td>{{ $output->workshopSpb->explanation_items }}</td>
-                                    <td>{{ $output->quantity_produced }}</td>
-                                    <td>{{ $output->workshopSpb->unit }}</td>
-                                    <td>{{ $output->spb->spb_number }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary"
-                                            onclick="selectItem('workshop_output', {{ $output->id }}, '{{ $output->workshopSpb->explanation_items }}', '{{ $output->workshopSpb->unit }}', {{ $output->quantity_produced }})">
-                                            <i class="fas fa-plus"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">Tidak ada hasil workshop</td>
-                                </tr>
-                                @endforelse
-                            </tbody>
+                            @forelse($workshopOutputs as $output)
+                            <tr>
+                                <td>{{ $output->workshopSpb?->explanation_items ?? '-' }}</td>
+                                <td>{{ $output->quantity_produced }}</td>
+                                <td>{{ $output->workshopSpb?->unit ?? '-' }}</td>
+                                <td>{{ $output->spb?->spb_number ?? '-' }}</td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-primary"
+                                        onclick="selectItem('workshop_output', {{ $output->id }}, '{{ $output->workshopSpb?->explanation_items ?? '' }}', '{{ $output->workshopSpb?->unit ?? '' }}', {{ $output->quantity_produced }})">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            @empty
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada hasil workshop</td>
+                            </tr>
+                            @endforelse
+                        </tbody>
                         </table>
                     </div>
                 </div>

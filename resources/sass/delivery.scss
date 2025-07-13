@@ -1,11 +1,12 @@
 // Variables
 :root {
-    --delivery-primary: #2563eb;
+    --delivery-primary: #3B82F6;
     --delivery-secondary: #64748b;
     --delivery-success: #16a34a;
     --delivery-warning: #eab308;
     --delivery-danger: #dc2626;
     --sidebar-width: 250px;
+    --sidebar-collapsed-width: 70px;
 }
 
 // Base Layout
@@ -24,31 +25,34 @@ html, body {
 // Sidebar Styles
 .sidebar {
     width: var(--sidebar-width);
-    background: var(--delivery-primary); // biru utama
-    color: #fff;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
-    position: fixed;
-    height: 100vh;
-    z-index: 1000;
-    transition: all 0.3s ease;
+    background: var(--delivery-primary);
+    color: white;
+    min-height: 100vh;
+    transition: all 0.3s;
+
+    &.collapsed {
+        width: var(--sidebar-collapsed-width);
+
+        .company-name,
+        .components span {
+            display: none;
+        }
+    }
 
     .sidebar-header {
-        padding: 1.5rem;
-        background: #1f54c7; // 5% lebih gelap dari #2563eb
-        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        padding: 1.5rem 1rem;
+        background: #1f54cf;
         display: flex;
         align-items: center;
-        gap: 1rem;
 
         .logo {
-            height: 40px;
-            width: auto;
+            height: 32px;
+            margin-right: 0.75rem;
         }
 
         .company-name {
-            font-size: 1.125rem;
             font-weight: 600;
-            color: #fff;
+            font-size: 1.1rem;
         }
     }
 
@@ -56,22 +60,19 @@ html, body {
         padding: 1rem 0;
 
         li {
-            margin: 0.25rem 0;
-
             a {
                 padding: 0.75rem 1.5rem;
                 display: flex;
                 align-items: center;
-                color: #fff; // teks putih
+                color: rgba(255, 255, 255, 0.8);
                 text-decoration: none;
-                transition: all 0.2s ease;
-                border-left: 3px solid transparent;
+                transition: all 0.3s;
+                border-left: none; // Removed border
 
                 i {
                     width: 20px;
                     margin-right: 0.75rem;
-                    font-size: 1.125rem;
-                    color: #fff; // icon putih
+                    font-size: 1.1rem;
                 }
 
                 span {
@@ -79,16 +80,16 @@ html, body {
                 }
 
                 &:hover {
-                    color: #fff;
-                    background: rgba(255,255,255,0.08);
+                    color: white;
+                    background: #1f54cf;
                 }
             }
 
             &.active > a {
-                color: #fff;
-                background: rgba(255,255,255,0.16);
-                border-left-color: #fff;
-                font-weight: 500;
+                background: #1f54cf;
+                color: white;
+                font-weight: normal;
+                border-left: none; // Removed border
             }
         }
     }
@@ -97,7 +98,7 @@ html, body {
 // Content Area
 .content {
     flex: 1;
-    margin-left: var(--sidebar-width);
+    // margin-left: var(--sidebar-width);
     min-height: 100vh;
     background: #f8f9fa;
     transition: all 0.3s ease;

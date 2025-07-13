@@ -1,7 +1,8 @@
 <div class="modal fade" id="completeWorkshopTaskModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="completeWorkshopTaskForm" action="{{ route('head-of-division.tasks.complete', $task->id) }}" method="POST">
+            <form id="completeWorkshopTaskForm" action="{{ route('head-of-division.tasks.complete', $task->id) }}"
+                method="POST">
                 @csrf
                 @method('PATCH')
 
@@ -45,35 +46,22 @@
             <div class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label">Nama Barang</label>
-                    <input type="text"
-                           class="form-control"
-                           name="outputs[INDEX][item_name]"
-                           placeholder="Masukkan nama barang"
-                           required>
+                    <input type="text" class="form-control" name="outputs[INDEX][item_name]"
+                        placeholder="Masukkan nama barang" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Jumlah</label>
-                    <input type="number"
-                           class="form-control"
-                           name="outputs[INDEX][quantity_produced]"
-                           min="1"
-                           placeholder="Jumlah"
-                           required>
+                    <input type="number" class="form-control" name="outputs[INDEX][quantity_produced]" min="1"
+                        placeholder="Jumlah" required>
                 </div>
                 <div class="col-md-3">
                     <label class="form-label">Satuan</label>
-                    <input type="text"
-                           class="form-control"
-                           name="outputs[INDEX][unit]"
-                           placeholder="Satuan"
-                           required>
+                    <input type="text" class="form-control" name="outputs[INDEX][unit]" placeholder="Satuan"
+                        required>
                 </div>
                 <div class="col-12">
                     <label class="form-label">Catatan Produksi</label>
-                    <textarea class="form-control"
-                              name="outputs[INDEX][notes]"
-                              rows="2"
-                              placeholder="Catatan tambahan (opsional)"></textarea>
+                    <textarea class="form-control" name="outputs[INDEX][notes]" rows="2" placeholder="Catatan tambahan (opsional)"></textarea>
                 </div>
                 <div class="col-12">
                     <button type="button" class="btn btn-sm btn-danger" onclick="removeProductionItem(this)">
@@ -86,53 +74,53 @@
 </template>
 
 @push('scripts')
-<script>
-let itemIndex = 0;
+    <script>
+        let itemIndex = 0;
 
-function addProductionItem() {
-    const template = document.getElementById('productionItemTemplate').innerHTML;
-    const newItem = template.replace(/INDEX/g, itemIndex++);
-    document.getElementById('productionItems').insertAdjacentHTML('beforeend', newItem);
-}
+        function addProductionItem() {
+            const template = document.getElementById('productionItemTemplate').innerHTML;
+            const newItem = template.replace(/INDEX/g, itemIndex++);
+            document.getElementById('productionItems').insertAdjacentHTML('beforeend', newItem);
+        }
 
-function removeProductionItem(button) {
-    button.closest('.production-item').remove();
-}
+        function removeProductionItem(button) {
+            button.closest('.production-item').remove();
+        }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('completeWorkshopTaskForm');
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('completeWorkshopTaskForm');
 
-    // Add initial item
-    addProductionItem();
+            // Add initial item
+            addProductionItem();
 
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-            // Validate form
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
+                    // Validate form
+                    if (!form.checkValidity()) {
+                        form.reportValidity();
+                        return;
+                    }
+
+                    // Show confirmation dialog
+                    Swal.fire({
+                        title: 'Konfirmasi Input Produksi',
+                        text: 'Pastikan data hasil produksi sudah benar. Data yang disimpan tidak dapat diubah.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Ya, Simpan',
+                        cancelButtonText: 'Periksa Kembali',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
             }
-
-            // Show confirmation dialog
-            Swal.fire({
-                title: 'Konfirmasi Input Produksi',
-                text: 'Pastikan data hasil produksi sudah benar. Data yang disimpan tidak dapat diubah.',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Simpan',
-                cancelButtonText: 'Periksa Kembali',
-                reverseButtons: true
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
         });
-    }
-});
-</script>
+    </script>
 @endpush

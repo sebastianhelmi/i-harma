@@ -51,7 +51,7 @@ class SpbController extends Controller
         // Check which SPBs have items ready to take
         foreach ($spbs as $spb) {
             $spb->can_take_items = ($spb->status === 'approved' && $spb->po && $spb->po->status === 'completed') ||
-                                   ($spb->status === 'approved' && $spb->status_po === 'not_required');
+                ($spb->status === 'approved' && $spb->status_po === 'not_required');
         }
 
         return view('head-of-division.spbs.index', compact('spbs', 'projects'));
@@ -109,6 +109,7 @@ class SpbController extends Controller
             'item_category_id' => 'required|exists:item_categories,id',
             'category_entry' => 'required|in:site,workshop',
             'remarks' => 'nullable|string',
+            'estimasi_pakai' => 'nullable|date',
 
             // Site items validation
             'site_items' => 'required_if:category_entry,site|array|min:1',
@@ -124,7 +125,6 @@ class SpbController extends Controller
             'workshop_items.*.quantity' => 'required_if:category_entry,workshop|integer|min:1',
             'workshop_items.*.unit' => 'required_if:category_entry,workshop|string',
         ]);
-
         // Verify task belongs to current user
         $task = Task::findOrFail($validated['task_id']);
         if ($task->assigned_to !== Auth::id()) {
@@ -203,13 +203,13 @@ class SpbController extends Controller
 
         // Check if items can be taken
         $canTakeItems = $spb->status === 'approved' &&
-                        $spb->po &&
-                        $spb->po->status === 'completed';
+            $spb->po &&
+            $spb->po->status === 'completed';
 
         // Get inventory transactions to check collected items through PO
-        $collectedItems = InventoryTransaction::whereHas('po', function($query) use ($spb) {
-                $query->where('spb_id', $spb->id);
-            })
+        $collectedItems = InventoryTransaction::whereHas('po', function ($query) use ($spb) {
+            $query->where('spb_id', $spb->id);
+        })
             ->where('transaction_type', 'OUT')
             ->get()
             ->groupBy('inventory_id');
@@ -225,8 +225,8 @@ class SpbController extends Controller
                 } else {
                     // If SPB is not yet approved or PO not completed, check inventory for potential 'insufficient_stock'
                     $inventory = Inventory::where('item_name', $item->item_name)
-                                        ->where('unit', $item->unit)
-                                        ->first();
+                        ->where('unit', $item->unit)
+                        ->first();
                     if (!$inventory || $inventory->quantity < $item->quantity) {
                         $status = 'insufficient_stock';
                     }

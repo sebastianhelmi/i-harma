@@ -32,4 +32,14 @@ class Inventory extends Model
     {
         return $this->hasMany(InventoryTransaction::class);
     }
+
+    public function siteSpbs()
+    {
+        return $this->hasMany(SiteSpb::class, 'item_name', 'item_name');
+    }
+
+    public function deliveryDraftItems()
+    {
+        return $this->morphMany(DeliveryDraftItem::class, 'source');
+    }
 }

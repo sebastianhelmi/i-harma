@@ -18,7 +18,8 @@ class Spb extends Model
         'status_po',
         'remarks',
         'approved_at',
-        'approved_by'
+        'approved_by',
+        'estimasi_pakai',
     ];
 
     protected $casts = [
@@ -70,7 +71,7 @@ class Spb extends Model
 
     public function getStatusBadgeClass()
     {
-        return match($this->status) {
+        return match ($this->status) {
             'pending' => 'warning',
             'approved' => 'success',
             'rejected' => 'danger',

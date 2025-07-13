@@ -132,8 +132,9 @@
                                 <tbody>
                                     @foreach ($task->workshopOutputs as $output)
                                         <tr>
-                                            <td>{{ $output->workshopSpb->explanation_items }}</td>
-                                            <td>{{ $output->quantity_produced }} {{ $output->workshopSpb->unit }}</td>
+                                            <td>{{ $output->workshopSpb->explanation_items ?? '-' }}</td>
+                                            <td>{{ $output->quantity_produced }} {{ $output->workshopSpb->unit ?? '-' }}
+                                            </td>
                                             <td>
                                                 <span
                                                     class="badge bg-{{ $output->status === 'completed' ? 'success' : 'warning' }}">
@@ -279,56 +280,57 @@
             const modal = new bootstrap.Modal(document.getElementById('workshopOutputModal'));
             modal.show();
         }
+
         function showCompleteWorkshopModal() {
-    const modal = new bootstrap.Modal(document.getElementById('completeWorkshopTaskModal'));
-    modal.show();
-}
+            const modal = new bootstrap.Modal(document.getElementById('completeWorkshopTaskModal'));
+            modal.show();
+        }
         // Add form validation
         document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('completeWorkshopTaskForm');
-    if (form) {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
+            const form = document.getElementById('completeWorkshopTaskForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
 
-            // Validate quantities
-            const quantities = form.querySelectorAll('input[name$="[quantity_produced]"]');
-            let isValid = true;
+                    // Validate quantities
+                    const quantities = form.querySelectorAll('input[name$="[quantity_produced]"]');
+                    let isValid = true;
 
-            quantities.forEach(input => {
-                if (parseInt(input.value) < 1) {
-                    isValid = false;
-                    input.classList.add('is-invalid');
-                } else {
-                    input.classList.remove('is-invalid');
-                }
-            });
+                    quantities.forEach(input => {
+                        if (parseInt(input.value) < 1) {
+                            isValid = false;
+                            input.classList.add('is-invalid');
+                        } else {
+                            input.classList.remove('is-invalid');
+                        }
+                    });
 
-            if (!isValid) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Validasi Gagal',
-                    text: 'Pastikan semua jumlah produksi valid'
+                    if (!isValid) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Validasi Gagal',
+                            text: 'Pastikan semua jumlah produksi valid'
+                        });
+                        return;
+                    }
+
+                    // Confirm submission
+                    Swal.fire({
+                        title: 'Selesaikan Tugas?',
+                        text: 'Pastikan semua data produksi sudah benar',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#28a745',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Ya, Selesaikan',
+                        cancelButtonText: 'Batal'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
                 });
-                return;
             }
-
-            // Confirm submission
-            Swal.fire({
-                title: 'Selesaikan Tugas?',
-                text: 'Pastikan semua data produksi sudah benar',
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#28a745',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Ya, Selesaikan',
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    form.submit();
-                }
-            });
         });
-    }
-});
     </script>
 @endpush

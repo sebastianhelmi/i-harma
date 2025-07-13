@@ -29,4 +29,9 @@ class SiteSpb extends Model
     {
         return $this->belongsTo(DeliveryPlan::class);
     }
+
+    public function deliveryDraftItems()
+    {
+        return $this->morphMany(DeliveryDraftItem::class, 'source');
+    }
 }

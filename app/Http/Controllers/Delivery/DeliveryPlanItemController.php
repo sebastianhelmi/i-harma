@@ -5,40 +5,68 @@ namespace App\Http\Controllers\Delivery;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryPlan;
 use App\Models\Inventory;
+use App\Models\Project;
 use App\Models\WorkshopOutput;
 use App\Models\SiteSpb;
+use App\Models\Task;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class DeliveryPlanItemController extends Controller
 {
-    public function create(DeliveryPlan $plan)
+    public function create(Request $request, DeliveryPlan $plan)
     {
         if (!$plan->canBeUpdated()) {
             return back()->with('error', 'Rencana pengiriman tidak dapat diubah');
         }
 
+        $projects = Project::all();
+        $tasks = Task::all();
+
+        $projectId = $request->input('project_id');
+        $taskId = $request->input('task_id');
+
         // Get inventory items that have SPB history
-        $inventoryItems = Inventory::with(['itemCategory'])
-            ->whereExists(function ($query) {
+        $inventoryItems = Inventory::with(['itemCategory', 'siteSpb'])
+            ->whereExists(function ($query) use ($projectId, $taskId) {
                 $query->select(DB::raw(1))
                     ->from('site_spbs')
                     ->join('spbs', 'site_spbs.spb_id', '=', 'spbs.id')
                     ->whereColumn('site_spbs.item_name', 'inventories.item_name')
                     ->whereNull('site_spbs.delivery_plan_id')
-                    ->where('spbs.status', 'approved');
+                    ->where('spbs.status', 'approved')
+                    ->when($projectId, function ($q) use ($projectId) {
+                        $q->where('spbs.project_id', $projectId);
+                    })
+                    ->when($taskId, function ($q) use ($taskId) {
+                        $q->where('spbs.task_id', $taskId);
+                    });
             })
             ->where('quantity', '>', 0)
             ->get();
 
-        $workshopOutputs = WorkshopOutput::with(['workshopSpb', 'spb'])
+        $workshopOutputs = WorkshopOutput::with(['workshopSpb', 'spb', 'inventory'])
             ->where('status', 'completed')
             ->whereNull('delivery_plan_id')
+            ->whereHas('spb', function ($query) use ($projectId, $taskId) {
+                $query->when($projectId, function ($q) use ($projectId) {
+                    $q->where('project_id', $projectId);
+                })
+                    ->when($taskId, function ($q) use ($taskId) {
+                        $q->where('task_id', $taskId);
+                    });
+            })
             ->get();
 
         $siteSpbItems = SiteSpb::with('spb')
-            ->whereHas('spb', function ($query) {
-                $query->where('status', 'approved');
+            ->whereHas('spb', function ($query) use ($projectId, $taskId) {
+                $query->where('status', 'approved')
+                    ->when($projectId, function ($q) use ($projectId) {
+                        $q->where('project_id', $projectId);
+                    })
+                    ->when($taskId, function ($q) use ($taskId) {
+                        $q->where('task_id', $taskId);
+                    });
             })
             ->whereNull('delivery_plan_id')
             ->get();
@@ -47,7 +75,9 @@ class DeliveryPlanItemController extends Controller
             'plan',
             'inventoryItems',
             'workshopOutputs',
-            'siteSpbItems'
+            'siteSpbItems',
+            'projects',
+            'tasks'
         ));
     }
 

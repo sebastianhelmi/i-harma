@@ -48,4 +48,9 @@ class WorkshopOutput extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function deliveryDraftItems()
+    {
+        return $this->morphMany(DeliveryDraftItem::class, 'source');
+    }
 }

@@ -29,28 +29,18 @@ class DeliveryDraftItem extends Model
         return $this->belongsTo(DeliveryPlan::class);
     }
 
-    public function inventory(): BelongsTo
+    public function source()
     {
-        return $this->belongsTo(Inventory::class);
-    }
-
-    public function workshopOutput(): BelongsTo
-    {
-        return $this->belongsTo(WorkshopOutput::class, 'source_id');
-    }
-
-    public function siteSpb(): BelongsTo
-    {
-        return $this->belongsTo(SiteSpb::class, 'source_id');
+        return $this->morphTo();
     }
 
     // Get source label
     public function getSourceLabel(): string
     {
         return match ($this->source_type) {
-            'inventory' => 'Inventori',
-            'workshop_output' => 'Workshop',
-            'site_spb' => 'SPB Site',
+            'App\Models\Inventory' => 'Inventori',
+            'App\Models\WorkshopOutput' => 'Workshop',
+            'App\Models\SiteSpb' => 'SPB Site',
             default => 'Manual'
         };
     }
@@ -59,9 +49,9 @@ class DeliveryDraftItem extends Model
     public function getSourceBadgeClass(): string
     {
         return match ($this->source_type) {
-            'inventory' => 'primary',
-            'workshop_output' => 'info',
-            'site_spb' => 'warning',
+            'App\Models\Inventory' => 'primary',
+            'App\Models\WorkshopOutput' => 'info',
+            'App\Models\SiteSpb' => 'warning',
             default => 'secondary'
         };
     }

@@ -35,29 +35,39 @@ class ReceivedGoodsController extends Controller
 
     public function create(Po $po)
     {
-        if ($po->status !== 'pending') {
+        if ($po->status === 'completed') {
             return redirect()
                 ->route('inventory.received-goods.index')
-                ->with('error', 'PO ini tidak dapat diproses karena sudah selesai.');
+                ->with('error', 'PO ini sudah selesai dan tidak dapat diproses lagi.');
         }
 
         $po->load(['items', 'supplier', 'spb.project']);
 
-        // Check and prepare inventory items status
-        $itemsStatus = [];
+        $itemsWithStatus = [];
         foreach ($po->items as $item) {
             $inventory = Inventory::where('item_name', $item->item_name)
                 ->where('unit', $item->unit)
                 ->first();
 
-            $itemsStatus[$item->id] = [
+            $alreadyReceived = InventoryTransaction::where('po_id', $po->id)
+                ->whereHas('inventory', function ($query) use ($item) {
+                    $query->where('item_name', $item->item_name);
+                })
+                ->where('transaction_type', InventoryTransaction::TYPE_IN)
+                ->sum('quantity');
+
+            $remainingQuantity = $item->quantity - $alreadyReceived;
+
+            $itemsWithStatus[$item->id] = [
                 'exists' => !is_null($inventory),
                 'inventory' => $inventory,
-                'po_item' => $item
+                'po_item' => $item,
+                'already_received' => $alreadyReceived,
+                'remaining_quantity' => $remainingQuantity,
             ];
         }
 
-        return view('inventory.received_goods.create', compact('po', 'itemsStatus'));
+        return view('inventory.received_goods.create', compact('po', 'itemsWithStatus'));
     }
 
     public function storeItem(Request $request)
@@ -85,7 +95,6 @@ class ReceivedGoodsController extends Controller
                 'inventory' => $inventory,
                 'message' => 'Item berhasil ditambahkan'
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error creating inventory item:', [
                 'error' => $e->getMessage(),
@@ -99,43 +108,49 @@ class ReceivedGoodsController extends Controller
         }
     }
 
-             public function store(Request $request, Po $po)
-        {
-            // Add validation for PO status
-            if ($po->status !== 'pending') {
-                return back()->with('error', 'PO ini sudah tidak dapat diproses');
-            }
+    public function store(Request $request, Po $po)
+    {
+        // Add validation for PO status
+        if ($po->status !== 'pending') {
+            return back()->with('error', 'PO ini sudah tidak dapat diproses');
+        }
 
-            $validated = $request->validate([
-                'items' => 'required|array',
-                'items.*.quantity_received' => 'required|numeric|min:0',
-                'items.*.inventory_id' => 'required|exists:inventories,id',
-                'remarks' => 'nullable|string'
-            ]);
+        $validated = $request->validate([
+            'items' => 'required|array',
+            'items.*.quantity_received' => 'required|numeric|min:0',
+            'items.*.inventory_id' => 'required|exists:inventories,id',
+            'remarks' => 'nullable|string'
+        ]);
 
-            try {
-                DB::beginTransaction();
+        try {
+            DB::beginTransaction();
 
-                $allReceived = true;
-                $po->load('items'); // Eager load items
+            $po->load('items'); // Eager load items
 
-                foreach ($validated['items'] as $itemId => $item) {
-                    $poItem = $po->items->find($itemId);
+            foreach ($validated['items'] as $itemId => $item) {
+                $poItem = $po->items->find($itemId);
 
-                    if (!$poItem) {
-                        throw new \Exception("Item PO dengan ID {$itemId} tidak ditemukan");
-                    }
+                if (!$poItem) {
+                    throw new \Exception("Item PO dengan ID {$itemId} tidak ditemukan");
+                }
 
-                    // Validate quantity
-                    if ($item['quantity_received'] > $poItem->quantity) {
-                        throw new \Exception("Jumlah diterima tidak boleh melebihi jumlah order untuk {$poItem->item_name}");
-                    }
+                // Get total quantity already received for this item
+                $alreadyReceived = InventoryTransaction::where('po_id', $po->id)
+                    ->whereHas('inventory', function ($query) use ($poItem) {
+                        $query->where('item_name', $poItem->item_name);
+                    })
+                    ->where('transaction_type', InventoryTransaction::TYPE_IN)
+                    ->sum('quantity');
 
-                    if ($item['quantity_received'] < $poItem->quantity) {
-                        $allReceived = false;
-                    }
+                $remainingQuantity = $poItem->quantity - $alreadyReceived;
 
-                    // Update inventory
+                // Validate quantity
+                if ($item['quantity_received'] > $remainingQuantity) {
+                    throw new \Exception("Jumlah diterima ({$item['quantity_received']}) tidak boleh melebihi sisa jumlah order ({$remainingQuantity}) untuk item {$poItem->item_name}");
+                }
+
+                // Update inventory
+                if ($item['quantity_received'] > 0) {
                     $inventory = Inventory::findOrFail($item['inventory_id']);
                     $currentStock = $inventory->quantity;
                     $newStock = $currentStock + $item['quantity_received'];
@@ -153,30 +168,42 @@ class ReceivedGoodsController extends Controller
                         'stock_after_transaction' => $newStock
                     ]);
                 }
-
-                // Update PO status if needed
-                if ($allReceived) {
-                    $po->update(['status' => 'completed']);
-                }
-
-                DB::commit();
-
-                return redirect()
-                    ->route('inventory.received-goods.index')
-                    ->with('success', 'Penerimaan barang berhasil dicatat');
-
-            } catch (\Exception $e) {
-                DB::rollBack();
-                Log::error('Error recording received goods:', [
-                    'po_id' => $po->id,
-                    'error' => $e->getMessage(),
-                    'data' => $validated['items'] ?? [],
-                    'trace' => $e->getTraceAsString()
-                ]);
-
-                return back()
-                    ->withInput()
-                    ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
             }
+
+            // Update PO status if all items are fully received
+            $totalStillRemaining = 0;
+            foreach ($po->items as $poItem) {
+                $totalReceivedForItem = InventoryTransaction::where('po_id', $po->id)
+                    ->whereHas('inventory', function ($query) use ($poItem) {
+                        $query->where('item_name', $poItem->item_name);
+                    })
+                    ->where('transaction_type', InventoryTransaction::TYPE_IN)
+                    ->sum('quantity');
+                $totalStillRemaining += $poItem->quantity - $totalReceivedForItem;
+            }
+
+            if ($totalStillRemaining <= 0) {
+                $po->update(['status' => 'completed']);
+            }
+
+
+            DB::commit();
+
+            return redirect()
+                ->route('inventory.received-goods.index')
+                ->with('success', 'Penerimaan barang berhasil dicatat');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error recording received goods:', [
+                'po_id' => $po->id,
+                'error' => $e->getMessage(),
+                'data' => $validated['items'] ?? [],
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()
+                ->withInput()
+                ->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
+    }
 }

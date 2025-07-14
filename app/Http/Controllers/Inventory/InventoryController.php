@@ -44,12 +44,44 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'unit_price' => 'nullable|numeric|min:0',
             'weight' => 'nullable|numeric|min:0',
+            'notes' => 'nullable|string',
         ]);
+
+        $existingInventory = Inventory::where('item_name', $validated['item_name'])
+            ->where('item_category_id', $validated['item_category_id'])
+            ->first();
+
+        if ($existingInventory) {
+            $existingInventory->quantity += $validated['initial_stock'];
+            $existingInventory->save();
+
+            $existingInventory->transactions()->create([
+                'quantity' => $validated['initial_stock'],
+                'transaction_type' => 'IN',
+                'transaction_date' => now(),
+                'handled_by' => Auth::id(),
+                'remarks' => $validated['notes'] ?? 'Stok ditambahkan',
+                'stock_after_transaction' => $existingInventory->quantity,
+            ]);
+
+            return redirect()
+                ->route('inventory.items.index')
+                ->with('success', 'Stok barang berhasil ditambahkan dan tercatat dalam transaksi.');
+        }
 
         $validated['quantity'] = $validated['initial_stock'];
         $validated['added_by'] = Auth::id();
 
-        Inventory::create($validated);
+        $inventory = Inventory::create($validated);
+
+        $inventory->transactions()->create([
+            'quantity' => $validated['initial_stock'],
+            'transaction_type' => 'IN',
+            'transaction_date' => now(),
+            'handled_by' => Auth::id(),
+            'remarks' => $validated['notes'] ?? 'Stok awal',
+            'stock_after_transaction' => $inventory->quantity,
+        ]);
 
         return redirect()
             ->route('inventory.items.index')

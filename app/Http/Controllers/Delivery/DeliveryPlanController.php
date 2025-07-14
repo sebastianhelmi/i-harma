@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Delivery;
 
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryPlan;
+use App\Models\Inventory;
+use App\Models\InventoryTransaction;
 use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DeliveryPlanController extends Controller
 {
@@ -165,27 +168,36 @@ class DeliveryPlanController extends Controller
     public function updateStatus(Request $request, DeliveryPlan $plan)
     {
         $validated = $request->validate([
-            'status' => 'required|in:packing,ready,completed'
+            'status' => 'required|in:packing,ready,delivering,completed'
         ]);
 
-        // Validate status transition
         if (!$this->isValidStatusTransition($plan->status, $validated['status'])) {
             return back()->with('error', 'Status tidak dapat diubah');
         }
 
-        $plan->update([
-            'status' => $validated['status'],
-            'updated_by' => Auth::id()
-        ]);
+        try {
+            DB::beginTransaction();
 
-        $message = match ($validated['status']) {
-            'packing' => 'Packing dimulai',
-            'ready' => 'Pengiriman siap dilakukan',
-            'completed' => 'Pengiriman selesai',
-            default => 'Status berhasil diubah'
-        };
+            $plan->update([
+                'status' => $validated['status'],
+                'updated_by' => Auth::id()
+            ]);
 
-        return back()->with('success', $message);
+            DB::commit();
+
+            $message = match ($validated['status']) {
+                'packing' => 'Packing dimulai',
+                'ready' => 'Pengiriman siap dilakukan',
+                'delivering' => 'Pengiriman dalam perjalanan',
+                'completed' => 'Pengiriman selesai',
+                default => 'Status berhasil diubah'
+            };
+
+            return back()->with('success', $message);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
     }
 
     private function generatePlanNumber(): string
@@ -211,7 +223,8 @@ class DeliveryPlanController extends Controller
         $allowedTransitions = [
             'draft' => ['packing'],
             'packing' => ['ready'],
-            'ready' => ['completed']
+            'ready' => ['delivering'],
+            'delivering' => ['completed']
         ];
 
         return isset($allowedTransitions[$currentStatus]) &&

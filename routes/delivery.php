@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Delivery\DashboardController;
+use App\Http\Controllers\Delivery\DeliveryConfirmationController;
 use App\Http\Controllers\Delivery\DeliveryNoteController;
 use App\Http\Controllers\Delivery\DeliveryPlanController;
 use App\Http\Controllers\Delivery\DeliveryPlanItemController;
@@ -27,6 +28,10 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
         Route::put('/{plan}', [DeliveryPlanController::class, 'update'])->name('update');
         Route::delete('/{plan}', [DeliveryPlanController::class, 'destroy'])->name('destroy');
         Route::patch('/{plan}/status', [DeliveryPlanController::class, 'updateStatus'])->name('update-status');
+
+        // Delivery Confirmation Routes
+        Route::get('/{plan}/confirm', [DeliveryConfirmationController::class, 'showConfirmationForm'])->name('confirm.form');
+        Route::post('/{plan}/confirm', [DeliveryConfirmationController::class, 'confirmDelivery'])->name('confirm.store');
 
         // Add these new routes for item management
         Route::post('/{plan}/items', [DeliveryPlanItemController::class, 'store'])->name('items.store');

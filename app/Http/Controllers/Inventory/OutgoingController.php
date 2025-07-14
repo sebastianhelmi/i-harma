@@ -8,6 +8,8 @@ use App\Models\InventoryTransaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class OutgoingController extends Controller
 {
@@ -114,5 +116,57 @@ class OutgoingController extends Controller
         }
 
         return view('inventory.outgoing.show', compact('transaction'));
+    }
+
+    public function export(Request $request)
+    {
+        $query = InventoryTransaction::with(['inventory', 'handler'])
+            ->where('transaction_type', 'out');
+
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereBetween('transaction_date', [
+                $request->start_date,
+                $request->end_date
+            ]);
+        }
+
+        if ($request->filled('inventory_id')) {
+            $query->where('inventory_id', $request->inventory_id);
+        }
+
+        if ($request->filled('po_number')) {
+            $query->whereHas('po', function ($q) use ($request) {
+                $q->where('po_number', 'like', "%{$request->po_number}%");
+            });
+        }
+
+        $transactions = $query->latest()->get();
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'Tanggal');
+        $sheet->setCellValue('B1', 'Nama Barang');
+        $sheet->setCellValue('C1', 'Jumlah Keluar');
+        $sheet->setCellValue('D1', 'Satuan');
+        $sheet->setCellValue('E1', 'Ditangani Oleh');
+        $sheet->setCellValue('F1', 'Catatan');
+
+        $row = 2;
+        foreach ($transactions as $transaction) {
+            $sheet->setCellValue('A' . $row, $transaction->transaction_date->format('d-m-Y'));
+            $sheet->setCellValue('B' . $row, $transaction->inventory->item_name);
+            $sheet->setCellValue('C' . $row, abs($transaction->quantity));
+            $sheet->setCellValue('D' . $row, $transaction->inventory->unit);
+            $sheet->setCellValue('E' . $row, $transaction->handler->name);
+            $sheet->setCellValue('F' . $row, $transaction->remarks);
+            $row++;
+        }
+
+        $writer = new Xlsx($spreadsheet);
+        $fileName = 'outgoing-transactions-' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="' . $fileName . '"');
+        $writer->save('php://output');
     }
 }

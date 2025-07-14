@@ -27,8 +27,10 @@ Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('invent
     Route::post('received-goods/{po}', [ReceivedGoodsController::class, 'store'])->name('received-goods.store');
 
     Route::get('/outgoing', [OutgoingController::class, 'index'])->name('outgoing.index');
-    Route::get('/outgoing/{transaction}', [OutgoingController::class, 'show'])->name('outgoing.show');
+    Route::get('/outgoing/create', [OutgoingController::class, 'create'])->name('outgoing.create');
+    Route::post('/outgoing', [OutgoingController::class, 'store'])->name('outgoing.store');
     Route::get('/outgoing/export', [OutgoingController::class, 'export'])->name('outgoing.export');
+    Route::get('/outgoing/{transaction}', [OutgoingController::class, 'show'])->name('outgoing.show');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
 

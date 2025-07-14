@@ -164,7 +164,7 @@ class ReceivedGoodsController extends Controller
                         'transaction_type' => InventoryTransaction::TYPE_IN,
                         'transaction_date' => now(),
                         'handled_by' => Auth::id(),
-                        'remarks' => $validated['remarks'] ?? null,
+                        'remarks' => $validated['remarks'] ?? "Penerimaan barang dari PO #{$po->po_number}",
                         'stock_after_transaction' => $newStock
                     ]);
                 }

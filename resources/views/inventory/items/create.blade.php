@@ -89,6 +89,15 @@
                                 @enderror
                             </div>
                         </div>
+                        <div class="col-12">
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">Catatan</label>
+                                <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" name="notes" rows="3">{{ old('notes') }}</textarea>
+                                @error('notes')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <div class="d-flex justify-content-end gap-2 mt-4">

@@ -8,6 +8,41 @@
         <div class="col-md-8">
             <x-delivery.plan-details :plan="$plan" />
 
+            <!-- Action Buttons -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Aksi Rencana Pengiriman</h5>
+                </div>
+                <div class="card-body d-flex gap-2">
+                    @if($plan->status === 'ready')
+                        <form action="{{ route('delivery.plans.update-status', $plan) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <input type="hidden" name="status" value="delivering">
+                            <button type="submit" class="btn btn-warning">
+                                <i class="fas fa-truck me-1"></i>Mulai Pengiriman
+                            </button>
+                        </form>
+                    @elseif($plan->status === 'delivering')
+                        <a href="{{ route('delivery.plans.confirm.form', $plan) }}" class="btn btn-success">
+                            <i class="fas fa-check-circle me-1"></i>Konfirmasi Penerimaan Barang
+                        </a>
+                    @endif
+
+                    @if($plan->canBeUpdated())
+                        <a href="{{ route('delivery.plans.edit', $plan) }}" class="btn btn-info">
+                            <i class="fas fa-edit me-1"></i>Edit Rencana
+                        </a>
+                    @endif
+
+                    @if($plan->canBeCancelled())
+                        <button type="button" class="btn btn-danger" onclick="confirmCancel('{{ $plan->id }}')">
+                            <i class="fas fa-times-circle me-1"></i>Batalkan Rencana
+                        </button>
+                    @endif
+                </div>
+            </div>
+
             <x-delivery.packing-list :plan="$plan" />
         </div>
 

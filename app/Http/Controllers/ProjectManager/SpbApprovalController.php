@@ -75,6 +75,19 @@ class SpbApprovalController extends Controller
             'description' => 'SPB telah disetujui'
         ]);
 
+        // Kirim notifikasi ke Head of Division (requester)
+        $requester = $spb->requester;
+        if ($requester) {
+            $requester->notify(new \App\Notifications\SpbApprovedNotification($spb));
+        }
+        // Kirim notifikasi ke semua user Purchasing
+        $purchasingUsers = \App\Models\User::whereHas('role', function($q) {
+            $q->where('name', 'Purchasing');
+        })->get();
+        foreach ($purchasingUsers as $user) {
+            $user->notify(new \App\Notifications\SpbApprovedForPurchasingNotification($spb));
+        }
+
         return redirect()
             ->route('pm.spb-approvals.index')
             ->with('success', "SPB {$spb->spb_number} telah disetujui.");

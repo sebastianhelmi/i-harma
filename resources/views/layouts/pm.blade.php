@@ -60,8 +60,8 @@
                 </li>
                 {{-- {{ request()->routeIs('pm.settings*') ? 'active' : '' }} --}}
                 {{-- <li class=""> --}}
-                    {{-- {{ route('pm.settings.index') }} --}}
-                    {{-- <a href="">
+                {{-- {{ route('pm.settings.index') }} --}}
+                {{-- <a href="">
                         <i class="fas fa-cog"></i>
                         <span>Pengaturan</span>
                     </a>
@@ -88,12 +88,38 @@
                                 <i class="fas fa-bell"></i>
                                 <span
                                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    3
+                                    {{ auth()->user()->unreadNotifications->count() }}
                                 </span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end">
+                            <div class="dropdown-menu dropdown-menu-end" style="min-width: 350px; max-width: 400px;">
                                 <h6 class="dropdown-header">Notifikasi</h6>
-                                <!-- Notification items will go here -->
+                                @php
+                                    $spbNotifications = auth()
+                                        ->user()
+                                        ->unreadNotifications->where(
+                                            'type',
+                                            \App\Notifications\NewSpbApprovalNotification::class,
+                                        );
+                                @endphp
+                                @forelse($spbNotifications as $notification)
+                                    <a href="{{ route('notifications.read', [
+                                        'id' => $notification->id,
+                                        'redirect' => route('pm.spb-approvals.show', $notification->data['spb_id']),
+                                    ]) }}"
+                                        class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                        <div>
+                                            <div><strong>SPB #{{ $notification->data['spb_number'] }}</strong>
+                                                membutuhkan persetujuan</div>
+                                            <div class="small text-muted">
+                                                Proyek: {{ $notification->data['project_name'] }}<br>
+                                                Oleh: {{ $notification->data['created_by'] }}<br>
+                                                <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @empty
+                                    <div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>
+                                @endforelse
                             </div>
                         </div>
 

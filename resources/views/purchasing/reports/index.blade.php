@@ -41,8 +41,14 @@
         </div>
 
         <div class="card mt-4">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Hasil Laporan</h5>
+                @if (request('start_date') && request('end_date'))
+                    <a href="{{ route('purchasing.reports.export-pdf', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
+                        target="_blank" class="btn btn-success">
+                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                    </a>
+                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -66,7 +72,7 @@
                                         </td>
                                         <td>{{ $po->order_date->format('d/m/Y') }}</td>
                                         <td>{{ $po->spb->project->name }}</td>
-                                        <td>{{ $po->supplier->name }}</td>
+                                        <td>{{ $po->supplier->name ?? ($po->company_name ?? '-') }}</td>
                                         <td>Rp {{ number_format($po->total_amount, 2) }}</td>
                                         <td>
                                             <span class="badge bg-{{ $po->getStatusBadgeClass() }}">

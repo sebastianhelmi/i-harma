@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class ProjectController extends Controller
 {
@@ -248,5 +249,92 @@ class ProjectController extends Controller
         $writer->save($tempFile);
 
         return response()->download($tempFile, $filename)->deleteFileAfterSend(true);
+    }
+
+    public function exportSummaryPdf(Project $project)
+    {
+        // Group by divisi (assigned_to Kepala Divisi), satu tabel per divisi
+        $tasks = $project->tasks()->with(['assignedTo', 'subtasks.assignedTo', 'spb.siteItems', 'spb.workshopItems', 'subtasks.spb.siteItems', 'subtasks.spb.workshopItems'])
+            ->whereNull('parent_task_id')->get();
+
+        $divisions = [];
+        foreach ($tasks as $task) {
+            $divKey = $task->assignedTo ? ($task->assignedTo->division->name ?? $task->assignedTo->name) : 'Tanpa Divisi';
+            if (!isset($divisions[$divKey])) {
+                $divisions[$divKey] = [];
+                $no[$divKey] = 1;
+            }
+            $divSummary = &$divisions[$divKey];
+            $divSummary[] = [
+                'type' => 'task',
+                'no' => $no[$divKey]++,
+                'description' => $task->name,
+                'qty' => '',
+                'unit' => '',
+                'unit_price' => '',
+                'total_cost' => '',
+                'remark' => '',
+            ];
+            // Item SPB pada task utama
+            if ($task->spb) {
+                foreach (array_merge($task->spb->siteItems->all() ?? [], $task->spb->workshopItems->all() ?? []) as $item) {
+                    $poItem = \App\Models\PoItem::where('spb_id', $task->spb->id)
+                        ->where('item_name', $item->item_name ?? $item->explanation_items)
+                        ->where('unit', $item->unit)
+                        ->first();
+                    $unit_price = $poItem->unit_price ?? $item->unit_price ?? '';
+                    $total_price = $poItem->total_price ?? (isset($unit_price) && $unit_price !== '' ? $unit_price * $item->quantity : '');
+                    $divSummary[] = [
+                        'type' => 'item',
+                        'no' => '',
+                        'description' => $item->item_name ?? $item->explanation_items,
+                        'qty' => $item->quantity,
+                        'unit' => $item->unit,
+                        'unit_price' => $unit_price,
+                        'total_cost' => $total_price,
+                        'remark' => $item->information ?? '',
+                    ];
+                }
+            }
+            foreach ($task->subtasks as $subtask) {
+                $divSummary[] = [
+                    'type' => 'subtask',
+                    'no' => '',
+                    'description' => $subtask->name,
+                    'qty' => '',
+                    'unit' => '',
+                    'unit_price' => '',
+                    'total_cost' => '',
+                    'remark' => '',
+                ];
+                if ($subtask->spb) {
+                    foreach (array_merge($subtask->spb->siteItems->all() ?? [], $subtask->spb->workshopItems->all() ?? []) as $item) {
+                        $poItem = \App\Models\PoItem::where('spb_id', $subtask->spb->id)
+                            ->where('item_name', $item->item_name ?? $item->explanation_items)
+                            ->where('unit', $item->unit)
+                            ->first();
+                        $unit_price = $poItem->unit_price ?? $item->unit_price ?? '';
+                        $total_price = $poItem->total_price ?? (isset($unit_price) && $unit_price !== '' ? $unit_price * $item->quantity : '');
+                        $divSummary[] = [
+                            'type' => 'item',
+                            'no' => '',
+                            'description' => $item->item_name ?? $item->explanation_items,
+                            'qty' => $item->quantity,
+                            'unit' => $item->unit,
+                            'unit_price' => $unit_price,
+                            'total_cost' => $total_price,
+                            'remark' => $item->information ?? '',
+                        ];
+                    }
+                }
+            }
+        }
+
+        $pdf = Pdf::loadView('pm.projects.summary-pdf', [
+            'project' => $project,
+            'divisions' => $divisions
+        ])->setPaper('a4', 'landscape');
+
+        return $pdf->download('summary-divisi-' . $project->name . '.pdf');
     }
 }

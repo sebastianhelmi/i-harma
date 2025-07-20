@@ -104,9 +104,9 @@ class DeliveryNoteController extends Controller
             }
 
 
-            // Update plan status to shipping instead of completed
+            // Update plan status to delivering instead of completed
             $plan->update([
-                'status' => DeliveryPlan::STATUS_SHIPPING,
+                'status' => 'delivering',
                 'updated_by' => Auth::id()
             ]);
 

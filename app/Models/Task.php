@@ -67,6 +67,10 @@ class Task extends Model
     {
         return $this->hasMany(Task::class, 'parent_task_id');
     }
+    public function taskItems()
+    {
+        return $this->hasMany(TaskItem::class);
+    }
     public function getStatusBadgeClass()
     {
         return match ($this->status) {

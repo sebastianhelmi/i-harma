@@ -215,6 +215,36 @@
                 </div>
             </div>
         @endif
+        <!-- Task Items Section -->
+        @if ($task->taskItems && $task->taskItems->isNotEmpty())
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Daftar Barang pada Tugas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-bordered align-middle">
+                            <thead>
+                                <tr>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($task->taskItems as $item)
+                                    <tr>
+                                        <td>{{ $item->nama_barang }}</td>
+                                        <td>{{ $item->jumlah }}</td>
+                                        <td>{{ $item->satuan }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        @endif
     </div>
 
 

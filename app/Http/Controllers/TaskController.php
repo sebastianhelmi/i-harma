@@ -120,7 +120,22 @@ class TaskController extends Controller
             return back()->with('error', 'Tasks can only be assigned to Division Heads.');
         }
 
-        Task::create($validated);
+        $task = Task::create($validated);
+
+        // Simpan data barang (task_items)
+        $items = $request->input('items', []);
+        foreach ($items as $item) {
+            if (!empty($item['nama_barang']) && !empty($item['jumlah']) && !empty($item['satuan'])) {
+                $task->taskItems()->create([
+                    'nama_barang' => $item['nama_barang'],
+                    'jumlah' => $item['jumlah'],
+                    'satuan' => $item['satuan'],
+                ]);
+            }
+        }
+
+        // Kirim notifikasi ke Head of Division yang ditugaskan
+        $assignedUser->notify(new \App\Notifications\NewTaskAssignedNotification($task));
 
         return redirect()
             ->route('pm.tasks.index')

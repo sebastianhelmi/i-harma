@@ -16,122 +16,153 @@
             </button>
         </div>
 
-        <!-- Summary Cards -->
-        <div class="row g-4 mb-4">
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card stat-card">
+        <!-- Summary Stats -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <div class="stat-icon bg-teal bg-opacity-10">
-                                <i data-lucide="shopping-cart"></i>
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-file-alt fa-2x text-primary"></i>
                             </div>
-                            <div class="ms-3">
-                                <h6 class="mb-1">Total POs</h6>
-                                <h3 class="mb-0">124</h3>
+                            <div>
+                                <h6 class="card-subtitle mb-1 text-muted">Total SPB Disetujui</h6>
+                                <h3 class="card-title mb-0">{{ $totalSpb }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card stat-card">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <div class="stat-icon bg-warning bg-opacity-10">
-                                <i data-lucide="clock"></i>
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-shopping-cart fa-2x text-warning"></i>
                             </div>
-                            <div class="ms-3">
-                                <h6 class="mb-1">Pending Approval</h6>
-                                <h3 class="mb-0">8</h3>
+                            <div>
+                                <h6 class="card-subtitle mb-1 text-muted">PO Pending</h6>
+                                <h3 class="card-title mb-0">{{ $pendingPo }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card stat-card">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <div class="stat-icon bg-info bg-opacity-10">
-                                <i data-lucide="loader"></i>
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
                             </div>
-                            <div class="ms-3">
-                                <h6 class="mb-1">In Progress</h6>
-                                <h3 class="mb-0">15</h3>
+                            <div>
+                                <h6 class="card-subtitle mb-1 text-muted">PO Selesai</h6>
+                                <h3 class="card-title mb-0">{{ $completedPo }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-sm-6 col-xl-3">
-                <div class="card stat-card">
+            <div class="col-md-3">
+                <div class="card h-100 border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex align-items-center">
-                            <div class="stat-icon bg-success bg-opacity-10">
-                                <i data-lucide="check-circle"></i>
+                            <div class="flex-shrink-0 me-3">
+                                <i class="fas fa-users fa-2x text-info"></i>
                             </div>
-                            <div class="ms-3">
-                                <h6 class="mb-1">Completed</h6>
-                                <h3 class="mb-0">101</h3>
+                            <div>
+                                <h6 class="card-subtitle mb-1 text-muted">Total Supplier</h6>
+                                <h3 class="card-title mb-0">{{ $suppliers }}</h3>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Recent POs and Supplier Performance -->
-        <div class="row g-4 mb-4">
-            <!-- Recent POs Table -->
-            <div class="col-12 col-xl-8">
-                <div class="card h-100">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Recent Purchase Orders</h5>
-                        <a href="{{ route('purchasing.orders.index') }}" class="btn btn-light btn-sm">
-                            View All
-                        </a>
+        <!-- PO Progress and SPB Waiting -->
+        <div class="row g-4">
+            <!-- PO Progress -->
+            <div class="col-lg-8">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">PO Terbaru</h5>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover">
-                                <thead>
-                                    <tr>
-                                        <th>PO Number</th>
-                                        <th>Supplier</th>
-                                        <th>Date</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>PO-2025-023</td>
-                                        <td>PT Semen Indonesia</td>
-                                        <td>Apr 8, 2025</td>
-                                        <td>Rp 15,000,000</td>
-                                        <td><span class="badge bg-warning">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>PO-2025-022</td>
-                                        <td>CV Baja Makmur</td>
-                                        <td>Apr 7, 2025</td>
-                                        <td>Rp 8,500,000</td>
-                                        <td><span class="badge bg-success">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>PO-2025-021</td>
-                                        <td>PT Kayu Jaya</td>
-                                        <td>Apr 7, 2025</td>
-                                        <td>Rp 12,300,000</td>
-                                        <td><span class="badge bg-info">In Progress</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="po-list">
+                            @forelse($poProgress as $po)
+                                <div class="po-item mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">PO #{{ $po->po_number }}</h6>
+                                        <span
+                                            class="badge bg-{{ $po->status === 'completed' ? 'success' : ($po->status === 'pending' ? 'warning' : 'danger') }}">
+                                            {{ ucfirst($po->status) }}
+                                        </span>
+                                    </div>
+                                    <div class="mb-1 small text-muted">Proyek: {{ $po->spb->project->name ?? '-' }}</div>
+                                    <div class="mb-1 small text-muted">Supplier: {{ $po->supplier->name ?? '-' }}</div>
+                                    <div class="mb-1 small text-muted">Tanggal:
+                                        {{ $po->order_date ? $po->order_date->format('d M Y') : '-' }}</div>
+                                </div>
+                            @empty
+                                <div class="text-muted">Tidak ada PO terbaru</div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
             </div>
-
+            <!-- SPB Waiting for PO -->
+            <div class="col-lg-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">SPB Menunggu PO</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="spb-list">
+                            @forelse($spbWaitingPo as $spb)
+                                <div class="spb-item p-3 mb-2 bg-light rounded">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">SPB #{{ $spb->spb_number }}</h6>
+                                        <small
+                                            class="text-muted">{{ $spb->spb_date ? $spb->spb_date->format('d M') : '-' }}</small>
+                                    </div>
+                                    <p class="mb-1 small">Proyek: {{ $spb->project->name ?? '-' }}</p>
+                                    <small class="text-muted">Diminta oleh: {{ $spb->requester->name ?? '-' }}</small>
+                                </div>
+                            @empty
+                                <div class="text-muted">Tidak ada SPB menunggu PO</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Notifications -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white">
+                        <h5 class="card-title mb-0">Notifikasi Terbaru</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="notification-list">
+                            @forelse($notifications as $notification)
+                                <div class="notification-item d-flex align-items-center p-3 border-bottom">
+                                    <div class="flex-shrink-0 me-3">
+                                        <i class="fas fa-bell text-primary fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ $notification->data['message'] ?? '-' }}</h6>
+                                        <small
+                                            class="text-muted">{{ $notification->created_at->format('d M Y H:i') }}</small>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-muted">Tidak ada notifikasi baru</div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
     @push('styles')

@@ -49,29 +49,8 @@ class DeliveryConfirmationController extends Controller
                 'updated_by' => Auth::id(),
             ]);
 
-            // Decrement inventory and create transactions
-            $plan->load('draftItems.inventory');
-
-            foreach ($plan->draftItems as $item) {
-                $inventory = $item->inventory;
-
-                if (!$inventory || $inventory->quantity < $item->quantity) {
-                    throw new \Exception("Stok tidak mencukupi untuk item: {$item->item_name}");
-                }
-
-                $inventory->decrement('quantity', $item->quantity);
-
-                InventoryTransaction::create([
-                    'inventory_id' => $inventory->id,
-                    'delivery_id' => $plan->id,
-                    'quantity' => -abs($item->quantity),
-                    'transaction_type' => 'OUT',
-                    'transaction_date' => now(),
-                    'handled_by' => Auth::id(),
-                    'remarks' => "Pengiriman selesai untuk rencana #{$plan->plan_number}",
-                    'stock_after_transaction' => $inventory->quantity,
-                ]);
-            }
+            // Tidak perlu cek stok dan tidak perlu update inventory di sini
+            // (Sudah di-handle saat membuat rencana pengiriman)
 
             DB::commit();
 

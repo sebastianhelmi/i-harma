@@ -112,6 +112,41 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
+                                            @php
+                                                $divisionReports = \App\Models\DivisionReport::where(
+                                                    'project_id',
+                                                    $task->project_id,
+                                                )
+                                                    ->get()
+                                                    ->filter(function ($report) use ($task) {
+                                                        $related = is_array($report->related_tasks)
+                                                            ? $report->related_tasks
+                                                            : json_decode($report->related_tasks, true);
+                                                        return in_array($task->id, $related ?? []);
+                                                    });
+                                            @endphp
+                                            @if ($divisionReports->count() === 1)
+                                                <a href="{{ route('pm.reports.show', $divisionReports->first()) }}"
+                                                    class="btn btn-outline-success" title="Lihat Laporan Divisi">
+                                                    <i class="fas fa-file-alt"></i>
+                                                </a>
+                                            @elseif($divisionReports->count() > 1)
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-outline-success dropdown-toggle"
+                                                        data-bs-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fas fa-file-alt"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        @foreach ($divisionReports as $report)
+                                                            <li><a class="dropdown-item"
+                                                                    href="{{ route('pm.reports.show', $report) }}">Laporan
+                                                                    {{ $report->report_number }}
+                                                                    ({{ $report->report_date->format('d M Y') }})
+                                                                </a></li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @endif
                                         </div>
                                     </td>
                                 </tr>

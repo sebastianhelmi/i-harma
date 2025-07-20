@@ -34,6 +34,11 @@ class DeliveryDraftItem extends Model
         return $this->morphTo();
     }
 
+    public function inventory()
+    {
+        return $this->belongsTo(Inventory::class);
+    }
+
     // Get source label
     public function getSourceLabel(): string
     {

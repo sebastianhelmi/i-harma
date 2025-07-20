@@ -5,12 +5,11 @@ use App\Http\Controllers\HeadOfDivision\ProjectController;
 use App\Http\Controllers\HeadOfDivision\ReportController;
 use App\Http\Controllers\HeadOfDivision\SpbController;
 use App\Http\Controllers\HeadOfDivision\TaskController;
+use App\Http\Controllers\HeadOfDivision\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->name('head-of-division.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('head-of-division.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/projects', [ProjectController::class, 'index'])->name('projects.index');
     Route::get('/projects/{project}', [ProjectController::class, 'show'])->name('projects.show');
     Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.index');
@@ -39,4 +38,17 @@ Route::middleware(['auth', 'role:Kepala Divisi'])->prefix('head-of-division')->n
 
 Route::middleware('auth')->prefix('api')->group(function () {
     Route::get('/projects/{project}/tasks', [TaskController::class, 'getProjectTasks']);
+    Route::get('/tasks/{task}/items', function($taskId) {
+        $task = \App\Models\Task::with('taskItems')->findOrFail($taskId);
+        return response()->json([
+            'items' => $task->taskItems->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'nama_barang' => $item->nama_barang,
+                    'jumlah' => $item->jumlah,
+                    'satuan' => $item->satuan,
+                ];
+            })->values()->all()
+        ]);
+    });
 });

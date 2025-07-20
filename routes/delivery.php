@@ -74,6 +74,7 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
     // Reports (Laporan)
     Route::prefix('reports')->name('reports.')->group(function () {
         Route::get('/', [ReportController::class, 'index'])->name('index');
+        Route::get('/export-pdf', [ReportController::class, 'exportPdf'])->name('export-pdf');
         Route::get('/generate', [ReportController::class, 'generate'])->name('generate');
         Route::get('/download/{report}', [ReportController::class, 'download'])->name('download');
     });

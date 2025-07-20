@@ -59,9 +59,11 @@
                                 <label class="form-label required">Drawing File</label>
                                 <input type="hidden" name="drawing_file" id="selected_drawing">
                                 <div class="input-group">
-                                    <input type="text" class="form-control @error('drawing_file') is-invalid @enderror" id="drawing_preview" readonly
-                                        placeholder="Select drawing from project files" value="{{ old('drawing_file') }}">
-                                    <button class="btn btn-outline-secondary @error('drawing_file') is-invalid @enderror" type="button" id="selectDrawingBtn" disabled>
+                                    <input type="text" class="form-control @error('drawing_file') is-invalid @enderror"
+                                        id="drawing_preview" readonly placeholder="Select drawing from project files"
+                                        value="{{ old('drawing_file') }}">
+                                    <button class="btn btn-outline-secondary @error('drawing_file') is-invalid @enderror"
+                                        type="button" id="selectDrawingBtn" disabled>
                                         <i class="fas fa-image me-1"></i>Select Drawing
                                     </button>
                                 </div>
@@ -158,6 +160,33 @@
                                 </div>
                             @endif
                         </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label required">Daftar Barang</label>
+                        <table class="table table-bordered align-middle" id="task-items-table">
+                            <thead>
+                                <tr>
+                                    <th>Nama Barang</th>
+                                    <th>Jumlah</th>
+                                    <th>Satuan</th>
+                                    <th width="40">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" name="items[0][nama_barang]" class="form-control" required>
+                                    </td>
+                                    <td><input type="number" name="items[0][jumlah]" class="form-control"
+                                            min="1" required></td>
+                                    <td><input type="text" name="items[0][satuan]" class="form-control" required></td>
+                                    <td class="text-center"><button type="button"
+                                            class="btn btn-danger btn-sm remove-item" disabled>&times;</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-item-btn"><i
+                                class="fas fa-plus me-1"></i>Tambah Barang</button>
                     </div>
 
                     <div class="text-end mt-4">
@@ -542,6 +571,28 @@
                     renderProjectFiles(files);
                     selectDrawingBtn.disabled = !files.length;
                 }
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                let itemIndex = 1;
+                const table = document.getElementById('task-items-table').getElementsByTagName('tbody')[0];
+                document.getElementById('add-item-btn').addEventListener('click', function() {
+                    const row = table.insertRow();
+                    row.innerHTML = `
+                        <td><input type="text" name="items[${itemIndex}][nama_barang]" class="form-control" required></td>
+                        <td><input type="number" name="items[${itemIndex}][jumlah]" class="form-control" min="1" required></td>
+                        <td><input type="text" name="items[${itemIndex}][satuan]" class="form-control" required></td>
+                        <td class="text-center"><button type="button" class="btn btn-danger btn-sm remove-item">&times;</button></td>
+                    `;
+                    itemIndex++;
+                });
+                table.addEventListener('click', function(e) {
+                    if (e.target.classList.contains('remove-item')) {
+                        const row = e.target.closest('tr');
+                        row.parentNode.removeChild(row);
+                    }
+                });
             });
         </script>
     @endpush

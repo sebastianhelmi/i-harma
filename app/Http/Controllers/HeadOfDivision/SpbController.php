@@ -92,11 +92,15 @@ class SpbController extends Controller
         // Get item categories
         $itemCategories = ItemCategory::pluck('name', 'id');
 
+        $siteItemsDefault = [["item_name" => "", "quantity" => "", "unit" => "", "information" => ""]];
+        $workshopItemsDefault = [["explanation_items" => "", "quantity" => "", "unit" => ""]];
         return view('head-of-division.spbs.create', compact(
             'projects',
             'tasks',
             'itemCategories',
-            'task'
+            'task',
+            'siteItemsDefault',
+            'workshopItemsDefault'
         ));
     }
 
@@ -145,6 +149,12 @@ class SpbController extends Controller
             'status' => 'pending',
             'status_po' => 'waiting'
         ]);
+
+        // Kirim notifikasi ke Project Manager
+        $projectManager = $spb->project->manager;
+        if ($projectManager) {
+            $projectManager->notify(new \App\Notifications\NewSpbApprovalNotification($spb));
+        }
 
         // Store items based on category
         if ($validated['category_entry'] === 'site') {

@@ -17,7 +17,7 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-1 text-muted">Total Proyek Aktif</h6>
-                                <h3 class="card-title mb-0">12</h3>
+                                <h3 class="card-title mb-0">{{ $totalProjects }}</h3>
                             </div>
                         </div>
                     </div>
@@ -32,7 +32,7 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-1 text-muted">Tugas Selesai Bulan Ini</h6>
-                                <h3 class="card-title mb-0">42</h3>
+                                <h3 class="card-title mb-0">{{ $completedTasksThisMonth }}</h3>
                             </div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-1 text-muted">Tugas Berjalan</h6>
-                                <h3 class="card-title mb-0">17</h3>
+                                <h3 class="card-title mb-0">{{ $activeTasks }}</h3>
                             </div>
                         </div>
                     </div>
@@ -62,7 +62,7 @@
                             </div>
                             <div>
                                 <h6 class="card-subtitle mb-1 text-muted">SPB Menunggu</h6>
-                                <h3 class="card-title mb-0">5</h3>
+                                <h3 class="card-title mb-0">{{ $pendingSpb }}</h3>
                             </div>
                         </div>
                     </div>
@@ -80,44 +80,26 @@
                     </div>
                     <div class="card-body">
                         <div class="project-list">
-                            <!-- Project 1 -->
-                            <div class="project-item mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">Gedung A</h6>
-                                    <span class="badge bg-primary">Berjalan</span>
+                            @forelse($projectProgress as $project)
+                                <div class="project-item mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="mb-0">{{ $project['name'] }}</h6>
+                                        <span
+                                            class="badge bg-{{ $project['status'] === 'completed' ? 'success' : ($project['status'] === 'pending' ? 'warning' : 'primary') }}">
+                                            {{ ucfirst($project['status']) }}
+                                        </span>
+                                    </div>
+                                    <div class="progress" style="height: 10px">
+                                        <div class="progress-bar bg-{{ $project['status'] === 'completed' ? 'success' : ($project['status'] === 'pending' ? 'warning' : 'primary') }}"
+                                            role="progressbar" style="width: {{ $project['progress'] }}%"
+                                            aria-valuenow="{{ $project['progress'] }}" aria-valuemin="0"
+                                            aria-valuemax="100"></div>
+                                    </div>
+                                    <small class="text-muted">{{ $project['progress'] }}% selesai</small>
                                 </div>
-                                <div class="progress" style="height: 10px">
-                                    <div class="progress-bar" role="progressbar" style="width: 75%" aria-valuenow="75"
-                                        aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <small class="text-muted">75% selesai</small>
-                            </div>
-
-                            <!-- Project 2 -->
-                            <div class="project-item mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">Pabrik X</h6>
-                                    <span class="badge bg-success">Selesai</span>
-                                </div>
-                                <div class="progress" style="height: 10px">
-                                    <div class="progress-bar bg-success" role="progressbar" style="width: 100%"
-                                        aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <small class="text-muted">100% selesai</small>
-                            </div>
-
-                            <!-- Project 3 -->
-                            <div class="project-item mb-4">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h6 class="mb-0">Gudang Y</h6>
-                                    <span class="badge bg-warning">Tertunda</span>
-                                </div>
-                                <div class="progress" style="height: 10px">
-                                    <div class="progress-bar bg-warning" role="progressbar" style="width: 35%"
-                                        aria-valuenow="35" aria-valuemin="0" aria-valuemax="100"></div>
-                                </div>
-                                <small class="text-muted">35% selesai</small>
-                            </div>
+                            @empty
+                                <div class="text-muted">Tidak ada proyek</div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -131,35 +113,19 @@
                     </div>
                     <div class="card-body">
                         <div class="task-list">
-                            <!-- Task 1 -->
-                            <div class="task-item p-3 mb-2 bg-light rounded">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-1">Pemasangan pipa</h6>
-                                    <small class="text-danger">8 Apr</small>
+                            @forelse($tasksThisWeek as $task)
+                                <div class="task-item p-3 mb-2 bg-light rounded">
+                                    <div class="d-flex justify-content-between">
+                                        <h6 class="mb-1">{{ $task->name }}</h6>
+                                        <small
+                                            class="{{ $task->due_date->isPast() ? 'text-danger' : 'text-muted' }}">{{ $task->due_date->format('d M') }}</small>
+                                    </div>
+                                    <p class="mb-1 small">Proyek: {{ $task->project->name }}</p>
+                                    <small class="text-muted">Assigned to: {{ $task->assignedTo->name ?? '-' }}</small>
                                 </div>
-                                <p class="mb-1 small">Proyek: Gedung A</p>
-                                <small class="text-muted">Assigned to: Dedi</small>
-                            </div>
-
-                            <!-- Task 2 -->
-                            <div class="task-item p-3 mb-2 bg-light rounded">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-1">Cat dinding</h6>
-                                    <small class="text-muted">10 Apr</small>
-                                </div>
-                                <p class="mb-1 small">Proyek: Gudang Y</p>
-                                <small class="text-muted">Assigned to: Sinta</small>
-                            </div>
-
-                            <!-- Task 3 -->
-                            <div class="task-item p-3 mb-2 bg-light rounded">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-1">Pasang pintu</h6>
-                                    <small class="text-muted">9 Apr</small>
-                                </div>
-                                <p class="mb-1 small">Proyek: Gedung A</p>
-                                <small class="text-muted">Assigned to: Anton</small>
-                            </div>
+                            @empty
+                                <div class="text-muted">Tidak ada tugas deadline minggu ini</div>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -175,38 +141,20 @@
                     </div>
                     <div class="card-body">
                         <div class="notification-list">
-                            <!-- Notification 1 -->
-                            <div class="notification-item d-flex align-items-center p-3 border-bottom">
-                                <div class="flex-shrink-0 me-3">
-                                    <i class="fas fa-check-circle text-success fa-lg"></i>
+                            @forelse($notifications as $notification)
+                                <div class="notification-item d-flex align-items-center p-3 border-bottom">
+                                    <div class="flex-shrink-0 me-3">
+                                        <i class="fas fa-bell text-primary fa-lg"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">{{ $notification->data['message'] ?? '-' }}</h6>
+                                        <small
+                                            class="text-muted">{{ $notification->created_at->format('d M Y H:i') }}</small>
+                                    </div>
                                 </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Tugas "Bersihkan Area" diselesaikan</h6>
-                                    <small class="text-muted">6 Apr 2025</small>
-                                </div>
-                            </div>
-
-                            <!-- Notification 2 -->
-                            <div class="notification-item d-flex align-items-center p-3 border-bottom">
-                                <div class="flex-shrink-0 me-3">
-                                    <i class="fas fa-file-alt text-primary fa-lg"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">SPB #SPB-00123 disetujui</h6>
-                                    <small class="text-muted">5 Apr 2025</small>
-                                </div>
-                            </div>
-
-                            <!-- Notification 3 -->
-                            <div class="notification-item d-flex align-items-center p-3">
-                                <div class="flex-shrink-0 me-3">
-                                    <i class="fas fa-exclamation-triangle text-warning fa-lg"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <h6 class="mb-1">Proyek "Gudang Y" tertunda</h6>
-                                    <small class="text-muted">4 Apr 2025</small>
-                                </div>
-                            </div>
+                            @empty
+                                <div class="text-muted">Tidak ada notifikasi baru</div>
+                            @endforelse
                         </div>
                     </div>
                 </div>

@@ -4,12 +4,11 @@ use App\Http\Controllers\Inventory\InventoryController;
 use App\Http\Controllers\Inventory\OutgoingController;
 use App\Http\Controllers\Inventory\ReceivedGoodsController;
 use App\Http\Controllers\Inventory\ReportController;
+use App\Http\Controllers\Inventory\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('inventory.')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('inventory.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/items', [InventoryController::class, 'index'])->name('items.index');
     Route::get('/items/create', [InventoryController::class, 'create'])->name('items.create');
@@ -33,6 +32,7 @@ Route::middleware(['auth', 'role:Inventory'])->prefix('inventory')->name('invent
     Route::get('/outgoing/{transaction}', [OutgoingController::class, 'show'])->name('outgoing.show');
 
     Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/export-pdf', [ReportController::class, 'exportPdf'])->name('reports.export-pdf');
 
     Route::get('/settings', function () {
         return view('inventory.settings');

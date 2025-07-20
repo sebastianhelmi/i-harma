@@ -118,6 +118,10 @@
                                                 class="btn btn-outline-primary">
                                                 <i class="fa-solid fa-edit"></i>
                                             </a>
+                                            <a href="{{ route('pm.projects.summary-pdf', $project) }}"
+                                                class="btn btn-outline-info" title="Export Summary PDF" target="_blank">
+                                                <i class="fa-solid fa-file-pdf"></i>
+                                            </a>
                                             <form action="{{ route('pm.projects.destroy', $project) }}" method="POST"
                                                 onsubmit="return confirm('Are you sure?')" class="d-inline">
                                                 @csrf
@@ -160,7 +164,8 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label class="form-label">Project Name</label>
-                            <input type="text" class="form-control" name="name" value="{{ old('name') }}" required>
+                            <input type="text" class="form-control" name="name" value="{{ old('name') }}"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Description</label>
@@ -198,8 +203,14 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Project Drawing Files</label>
-                            <input type="file" class="form-control" name="files[]" multiple>
-                            <small class="text-muted">You can select multiple files</small>
+                            <input type="file" class="form-control d-none" id="drawingFilesInput" accept="image/*"
+                                multiple>
+                            <button type="button" class="btn btn-outline-primary" id="addDrawingFilesBtn">
+                                <i class="fa fa-plus me-1"></i> Add Image(s)
+                            </button>
+                            <div id="drawingFilesPreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            <small class="text-muted">You can select multiple images. Selected images will be previewed
+                                below.</small>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Contract Document</label>
@@ -234,7 +245,72 @@
 
     @push('scripts')
         <script>
-            document.addEventListener('DOMContentLoaded', function() {});
+            document.addEventListener('DOMContentLoaded', function() {
+                const input = document.getElementById('drawingFilesInput');
+                const addBtn = document.getElementById('addDrawingFilesBtn');
+                const preview = document.getElementById('drawingFilesPreview');
+                let selectedFiles = [];
+
+                addBtn.addEventListener('click', () => input.click());
+
+                input.addEventListener('change', function(e) {
+                    // Add new files to selectedFiles array
+                    for (const file of Array.from(e.target.files)) {
+                        // Hindari duplikat berdasarkan nama dan ukuran
+                        if (!selectedFiles.some(f => f.name === file.name && f.size === file.size)) {
+                            selectedFiles.push(file);
+                        }
+                    }
+                    renderPreview();
+                    // Reset input agar bisa memilih file yang sama lagi jika perlu
+                    input.value = '';
+                });
+
+                function renderPreview() {
+                    preview.innerHTML = '';
+                    selectedFiles.forEach((file, idx) => {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const div = document.createElement('div');
+                            div.className = 'position-relative';
+                            div.style.width = '100px';
+                            div.style.height = '100px';
+                            div.innerHTML = `
+                                <img src="${e.target.result}" class="img-thumbnail" style="width:100px;height:100px;object-fit:cover;">
+                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0" data-idx="${idx}" style="z-index:2;">&times;</button>
+                            `;
+                            preview.appendChild(div);
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                }
+
+                preview.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'BUTTON') {
+                        const idx = parseInt(e.target.getAttribute('data-idx'));
+                        selectedFiles.splice(idx, 1);
+                        renderPreview();
+                    }
+                });
+
+                // Saat submit form, tambahkan file ke FormData
+                const form = addBtn.closest('form');
+                form.addEventListener('submit', function(e) {
+                    // Hapus input file yang sudah ada
+                    form.querySelectorAll('input[name="files[]"]').forEach(el => el.remove());
+                    // Tambahkan file ke form secara dinamis
+                    selectedFiles.forEach(file => {
+                        const dt = new DataTransfer();
+                        dt.items.add(file);
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.name = 'files[]';
+                        fileInput.files = dt.files;
+                        fileInput.classList.add('d-none');
+                        form.appendChild(fileInput);
+                    });
+                });
+            });
         </script>
     @endpush
 @endsection

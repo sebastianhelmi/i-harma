@@ -25,11 +25,13 @@
                 <form action="{{ route('inventory.reports.index') }}" method="GET" class="row g-3">
                     <div class="col-md-4">
                         <label for="start_date" class="form-label">Tanggal Mulai</label>
-                        <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                        <input type="date" id="start_date" name="start_date" class="form-control"
+                            value="{{ request('start_date') }}">
                     </div>
                     <div class="col-md-4">
                         <label for="end_date" class="form-label">Tanggal Selesai</label>
-                        <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                        <input type="date" id="end_date" name="end_date" class="form-control"
+                            value="{{ request('end_date') }}">
                     </div>
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary">Filter</button>
@@ -39,8 +41,14 @@
         </div>
 
         <div class="card mt-4">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Hasil Laporan</h5>
+                @if (request('start_date') && request('end_date'))
+                    <a href="{{ route('inventory.reports.export-pdf', ['start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
+                        target="_blank" class="btn btn-success">
+                        <i class="fas fa-file-pdf me-1"></i> Export PDF
+                    </a>
+                @endif
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -57,13 +65,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @if(request()->has('start_date'))
+                            @if (request()->has('start_date'))
                                 @forelse($transactions as $transaction)
                                     <tr>
                                         <td>{{ $transaction->transaction_date->format('d/m/Y H:i') }}</td>
                                         <td>{{ $transaction->inventory->item_name }}</td>
                                         <td>
-                                            <span class="badge bg-{{ $transaction->transaction_type === 'in' ? 'success' : 'danger' }}">
+                                            <span
+                                                class="badge bg-{{ $transaction->transaction_type == 'IN' ? 'success' : 'danger' }}">
                                                 {{ ucfirst($transaction->transaction_type) }}
                                             </span>
                                         </td>
@@ -77,7 +86,8 @@
                                         <td colspan="7" class="text-center py-4">
                                             <div class="text-muted">
                                                 <i class="fas fa-times-circle fa-2x mb-3"></i>
-                                                <p class="mb-0">Tidak ada data transaksi inventaris yang ditemukan untuk rentang tanggal yang dipilih.</p>
+                                                <p class="mb-0">Tidak ada data transaksi inventaris yang ditemukan untuk
+                                                    rentang tanggal yang dipilih.</p>
                                             </div>
                                         </td>
                                     </tr>

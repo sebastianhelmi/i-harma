@@ -75,10 +75,40 @@
                 </div>
 
                 <div class="d-flex align-items-center gap-3">
-                    <button class="notification-btn">
+                    <button class="notification-btn" data-bs-toggle="dropdown">
                         <i data-lucide="bell"></i>
-                        <span class="badge">3</span>
+                        <span class="badge">{{ auth()->user()->unreadNotifications->count() }}</span>
                     </button>
+                    <div class="dropdown-menu dropdown-menu-end" style="min-width: 350px; max-width: 400px;">
+                        <h6 class="dropdown-header">Notifikasi</h6>
+                        @php
+                            $poNotifications = auth()
+                                ->user()
+                                ->unreadNotifications->where(
+                                    'type',
+                                    \App\Notifications\NewPoCreatedNotification::class,
+                                );
+                        @endphp
+                        @forelse($poNotifications as $notification)
+                            <a href="{{ route('notifications.read', [
+                                'id' => $notification->id,
+                                'redirect' => route('inventory.received-goods.create', $notification->data['po_id']),
+                            ]) }}"
+                                class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                <div>
+                                    <div><strong>PO #{{ $notification->data['po_number'] }}</strong> siap diproses
+                                    </div>
+                                    <div class="small text-muted">
+                                        Proyek: {{ $notification->data['project_name'] }}<br>
+                                        Dibuat oleh: {{ $notification->data['created_by'] ?? '-' }}<br>
+                                        <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                    </div>
+                                </div>
+                            </a>
+                        @empty
+                            <div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>
+                        @endforelse
+                    </div>
 
                     <div class="user-menu dropdown">
                         <button class="user-btn dropdown-toggle" data-bs-toggle="dropdown">

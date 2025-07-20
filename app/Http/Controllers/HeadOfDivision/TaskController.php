@@ -59,7 +59,7 @@ class TaskController extends Controller
 
     public function show($id)
     {
-        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo', 'spb', 'workshopOutputs.workshopSpb'])
+        $task = Task::with(['project', 'subtasks', 'subtasks.assignedTo', 'spb', 'workshopOutputs.workshopSpb', 'taskItems'])
             ->findOrFail($id);
 
         // Check if task is assigned to current user

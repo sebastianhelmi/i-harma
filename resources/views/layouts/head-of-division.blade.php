@@ -53,21 +53,22 @@
                         <span>SPB</span>
                     </a>
                 </li>
-                @if(auth()->user()->division_id === 3) {{-- Civil Division ID --}}
-                <li class="{{ request()->routeIs('head-of-division.delivery-confirmations*') ? 'active' : '' }}">
-                    <a href="{{ route('head-of-division.delivery-confirmations.index') }}">
-                        <i class="fas fa-truck"></i>
-                        <span>Konfirmasi Pengiriman</span>
-                        @php
-                        $pendingCount = \App\Models\DeliveryPlan::where('status', 'shipping')->count();
-                        @endphp
-                        @if($pendingCount > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ $pendingCount }}
-                        </span>
-                        @endif
-                    </a>
-                </li>
+                @if (auth()->user()->division_id === 3) {{-- Civil Division ID --}}
+                    <li class="{{ request()->routeIs('head-of-division.delivery-confirmations*') ? 'active' : '' }}">
+                        <a href="{{ route('head-of-division.delivery-confirmations.index') }}">
+                            <i class="fas fa-truck"></i>
+                            <span>Konfirmasi Pengiriman</span>
+                            @php
+                                $pendingCount = \App\Models\DeliveryPlan::where('status', 'shipping')->count();
+                            @endphp
+                            @if ($pendingCount > 0)
+                                <span
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ $pendingCount }}
+                                </span>
+                            @endif
+                        </a>
+                    </li>
                 @endif
                 <li class="">
                     <a href="">
@@ -98,27 +99,65 @@
                                 <i class="fas fa-bell"></i>
                                 <span
                                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    3
+                                    {{ auth()->user()->unreadNotifications->count() }}
                                 </span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end notification-menu">
+                            <div class="dropdown-menu dropdown-menu-end notification-menu"
+                                style="min-width: 350px; max-width: 400px;">
                                 <h6 class="dropdown-header">Notifikasi</h6>
-                                <div class="notification-item">
-                                    <i class="fas fa-exclamation-circle text-warning"></i>
-                                    <div class="notification-content">
-                                        <p class="mb-0">2 tugas melewati deadline</p>
-                                        <small class="text-muted">5 menit yang lalu</small>
-                                    </div>
-                                </div>
-                                <div class="notification-item">
-                                    <i class="fas fa-file-alt text-primary"></i>
-                                    <div class="notification-content">
-                                        <p class="mb-0">Laporan mingguan belum dibuat</p>
-                                        <small class="text-muted">1 jam yang lalu</small>
-                                    </div>
-                                </div>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-center" href="#">Lihat semua notifikasi</a>
+                                @php
+                                    $spbApprovedNotifications = auth()
+                                        ->user()
+                                        ->unreadNotifications->where(
+                                            'type',
+                                            \App\Notifications\SpbApprovedNotification::class,
+                                        );
+                                    $taskAssignedNotifications = auth()
+                                        ->user()
+                                        ->unreadNotifications->where(
+                                            'type',
+                                            \App\Notifications\NewTaskAssignedNotification::class,
+                                        );
+                                @endphp
+                                @foreach ($taskAssignedNotifications as $notification)
+                                    <a href="{{ route('notifications.read', [
+                                        'id' => $notification->id,
+                                        'redirect' => route('head-of-division.tasks.show', $notification->data['task_id']),
+                                    ]) }}"
+                                        class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                        <div>
+                                            <div><strong>Tugas Baru:</strong> {{ $notification->data['task_name'] }}
+                                            </div>
+                                            <div class="small text-muted">
+                                                Proyek: {{ $notification->data['project_name'] }}<br>
+                                                Dari: {{ $notification->data['assigned_by'] ?? '-' }}<br>
+                                                Deadline:
+                                                {{ $notification->data['due_date'] ? \Carbon\Carbon::parse($notification->data['due_date'])->format('d M Y') : '-' }}<br>
+                                                <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                                @foreach ($spbApprovedNotifications as $notification)
+                                    <a href="{{ route('notifications.read', [
+                                        'id' => $notification->id,
+                                        'redirect' => route('head-of-division.spbs.show', $notification->data['spb_id']),
+                                    ]) }}"
+                                        class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                        <div>
+                                            <div><strong>SPB #{{ $notification->data['spb_number'] }}</strong> telah
+                                                disetujui</div>
+                                            <div class="small text-muted">
+                                                Proyek: {{ $notification->data['project_name'] }}<br>
+                                                Disetujui oleh: {{ $notification->data['approved_by'] ?? '-' }}<br>
+                                                <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                @endforeach
+                                @if ($taskAssignedNotifications->isEmpty() && $spbApprovedNotifications->isEmpty())
+                                    <div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>
+                                @endif
                             </div>
                         </div>
 
@@ -170,25 +209,25 @@
 
     @stack('scripts')
     @if (session('success'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'success',
                 title: 'Berhasil',
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000
             });
-    </script>
+        </script>
     @endif
 
     @if (session('error'))
-    <script type="module">
-        Swal.fire({
+        <script type="module">
+            Swal.fire({
                 icon: 'error',
                 title: 'Error',
                 text: "{{ session('error') }}"
             });
-    </script>
+        </script>
     @endif
 </body>
 

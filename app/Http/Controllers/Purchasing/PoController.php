@@ -198,6 +198,14 @@ class PoController extends Controller
             Spb::findOrFail($validated['spb_id'])
                 ->update(['status_po' => 'ordered']);
 
+            // Kirim notifikasi ke semua user Inventory
+            $inventoryUsers = \App\Models\User::whereHas('role', function($q) {
+                $q->where('name', 'Inventory');
+            })->get();
+            foreach ($inventoryUsers as $user) {
+                $user->notify(new \App\Notifications\NewPoCreatedNotification($po));
+            }
+
             DB::commit();
 
             return response()->json([

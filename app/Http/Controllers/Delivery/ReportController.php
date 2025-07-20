@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Delivery;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryNote;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Models\DeliveryDraftItem;
 
 class ReportController extends Controller
 {
@@ -38,5 +40,29 @@ class ReportController extends Controller
     public function download()
     {
         // Logic to download report
+    }
+
+    public function exportPdf(Request $request)
+    {
+        $request->validate([
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
+        ]);
+
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+
+        $deliveryNotes = \App\Models\DeliveryNote::with(['deliveryPlan.project'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->latest('created_at')
+            ->get();
+
+        // Ambil detail item untuk setiap delivery note
+        foreach ($deliveryNotes as $note) {
+            $note->items = $note->deliveryPlan ? $note->deliveryPlan->draftItems : collect();
+        }
+
+        $pdf = Pdf::loadView('delivery.reports.pdf', compact('deliveryNotes', 'startDate', 'endDate'));
+        return $pdf->download('laporan-delivery-' . $startDate . '-' . $endDate . '.pdf');
     }
 }

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Illuminate\Support\Str;
+use App\Models\DivisionReport;
 
 class ReportController extends Controller
 {
@@ -62,6 +63,12 @@ class ReportController extends Controller
         }
 
         return view('pm.reports.index', compact('projectsData'));
+    }
+
+    public function show(DivisionReport $report)
+    {
+        $report->load(['project', 'creator', 'acknowledger', 'tasks']);
+        return view('pm.reports.show', compact('report'));
     }
 
     public function exportExcel(Request $request)

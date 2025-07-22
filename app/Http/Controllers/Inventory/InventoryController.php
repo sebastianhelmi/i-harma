@@ -103,9 +103,27 @@ class InventoryController extends Controller
             'unit' => 'required|string|max:50',
             'unit_price' => 'nullable|numeric|min:0',
             'weight' => 'nullable|numeric|min:0',
+            'quantity' => 'required|integer|min:0',
         ]);
 
+        $oldQuantity = $item->quantity;
+        $newQuantity = $validated['quantity'];
+
         $item->update($validated);
+
+        if ($newQuantity !== $oldQuantity) {
+            $transactionType = $newQuantity > $oldQuantity ? 'IN' : 'OUT';
+            $quantityChange = abs($newQuantity - $oldQuantity);
+
+            $item->transactions()->create([
+                'quantity' => $quantityChange,
+                'transaction_type' => $transactionType,
+                'transaction_date' => now(),
+                'handled_by' => Auth::id(),
+                'remarks' => 'Stok diperbarui dari halaman edit',
+                'stock_after_transaction' => $newQuantity,
+            ]);
+        }
 
         return redirect()
             ->route('inventory.items.index')

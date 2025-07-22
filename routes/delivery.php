@@ -13,10 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery.')->group(function () {
     // Dashboard
-    // Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/dashboard', function () {
-        return view('delivery.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Delivery Plans (Rencana Pengiriman)
     Route::prefix('plans')->name('plans.')->group(function () {

@@ -12,7 +12,7 @@ class DeliveryPlan extends Model
     public const STATUS_DRAFT = 'draft';
     public const STATUS_PACKING = 'packing';
     public const STATUS_READY = 'ready';
-    public const STATUS_SHIPPING = 'shipping';    // Add this line
+    public const STATUS_SHIPPING = 'delivering';    // Add this line
     public const STATUS_COMPLETED = 'completed';
     public const STATUS_CANCELLED = 'cancelled';
 

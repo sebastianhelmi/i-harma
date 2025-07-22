@@ -27,7 +27,8 @@
                             <div class="mb-3">
                                 <label for="item_name" class="form-label required">Nama Item</label>
                                 <input type="text" class="form-control @error('item_name') is-invalid @enderror"
-                                    id="item_name" name="item_name" value="{{ old('item_name', $item->item_name) }}" required>
+                                    id="item_name" name="item_name" value="{{ old('item_name', $item->item_name) }}"
+                                    required>
                                 @error('item_name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -49,7 +50,7 @@
                                 @enderror
                             </div>
 
-                             <div class="mb-3">
+                            <div class="mb-3">
                                 <label for="category" class="form-label">Sub Kategori</label>
                                 <input type="text" class="form-control @error('category') is-invalid @enderror"
                                     id="category" name="category" value="{{ old('category', $item->category) }}">
@@ -74,18 +75,19 @@
                                 <div class="input-group">
                                     <span class="input-group-text">Rp</span>
                                     <input type="number" class="form-control @error('unit_price') is-invalid @enderror"
-                                        id="unit_price" name="unit_price" value="{{ old('unit_price', $item->unit_price) }}">
+                                        id="unit_price" name="unit_price"
+                                        value="{{ old('unit_price', $item->unit_price) }}">
                                 </div>
                                 @error('unit_price')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
-                             <div class="mb-3">
-                                <label for="weight" class="form-label">Berat (kg)</label>
-                                <input type="number" step="0.01" class="form-control @error('weight') is-invalid @enderror"
-                                    id="weight" name="weight" value="{{ old('weight', $item->weight) }}">
-                                @error('weight')
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label required">Stok</label>
+                                <input type="number" class="form-control @error('quantity') is-invalid @enderror"
+                                    id="quantity" name="quantity" value="{{ old('quantity', $item->quantity) }}" required>
+                                @error('quantity')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

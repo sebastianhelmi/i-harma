@@ -10,6 +10,7 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\DuplicateDeliveryPlanDateNotification;
 
 class DeliveryPlanController extends Controller
 {
@@ -85,6 +86,30 @@ class DeliveryPlanController extends Controller
             'created_by' => Auth::id()
         ]);
 
+        // Check for duplicate planned_date and notify Project Managers
+        $existingPlanOnSameDate = DeliveryPlan::whereDate('planned_date', $validated['planned_date'])
+            ->where('id', '!=', $plan->id) // Exclude the newly created plan itself
+            ->first();
+
+        if ($existingPlanOnSameDate) {
+            $projectManagers = \App\Models\User::whereHas('role', function ($query) {
+                $query->where('name', 'Project Manager');
+            })->get();
+
+            foreach ($projectManagers as $pm) {
+                $pm->notify(new \App\Notifications\DuplicateDeliveryPlanDateNotification($plan, $existingPlanOnSameDate));
+            }
+        }
+
+        // Notify Delivery role users
+        $deliveryUsers = \App\Models\User::whereHas('role', function ($query) {
+            $query->where('name', 'Delivery');
+        })->get();
+
+        foreach ($deliveryUsers as $user) {
+            $user->notify(new \App\Notifications\NewSiteSpbForDeliveryNotification($plan));
+        }
+
         return redirect()
             ->route('delivery.plans.show', $plan)
             ->with('success', 'Rencana pengiriman berhasil dibuat');
@@ -100,7 +125,9 @@ class DeliveryPlanController extends Controller
             'updater'
         ]);
 
-        return view('delivery.plans.show', compact('plan'));
+        $haveDeliveryNote = $plan->deliveryNotes->isNotEmpty();
+
+        return view('delivery.plans.show', compact('plan', 'haveDeliveryNote'));
     }
 
     public function edit(DeliveryPlan $plan)
@@ -170,6 +197,7 @@ class DeliveryPlanController extends Controller
         $validated = $request->validate([
             'status' => 'required|in:packing,ready,delivering,completed'
         ]);
+
 
         if (!$this->isValidStatusTransition($plan->status, $validated['status'])) {
             return back()->with('error', 'Status tidak dapat diubah');

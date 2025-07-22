@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\NewWorkshopOutputForDeliveryNotification;
 
 class TaskController extends Controller
 {
@@ -177,7 +178,7 @@ class TaskController extends Controller
                             ->first();
 
                         // Record workshop production output
-                        WorkshopOutput::create([
+                        $workshopOutput = WorkshopOutput::create([
                             'task_id' => $task->id,
                             'spb_id' => $task->spb->id,
                             'workshop_spb_id' => $workshopSpbItem->id ?? null, // Assign the found workshop_spb_id
@@ -186,8 +187,20 @@ class TaskController extends Controller
                             'notes' => $output['notes'] ?? null,
                             'created_by' => Auth::id(),
                             'status' => 'completed',
-                            'completed_at' => now()
+                            'completed_at' => now(),
+                            'need_delivery' => true, // Asumsi selalu butuh pengiriman jika dibuat dari sini
                         ]);
+
+                        // Notify Delivery role users if need_delivery is true
+                        if ($workshopOutput->need_delivery) {
+                            $deliveryUsers = \App\Models\User::whereHas('role', function ($query) {
+                                $query->where('name', 'Delivery');
+                            })->get();
+
+                            foreach ($deliveryUsers as $user) {
+                                $user->notify(new \App\Notifications\NewWorkshopOutputForDeliveryNotification($workshopOutput));
+                            }
+                        }
 
                         // Record manual input transaction
                         InventoryTransaction::create([

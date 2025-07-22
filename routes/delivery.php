@@ -80,4 +80,8 @@ Route::middleware(['auth', 'role:Delivery'])->prefix('delivery')->name('delivery
     Route::get('/profile', function () {
         return view('delivery.profile');
     })->name('profile');
+
+    // Notifications
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'read'])->name('notifications.read');
 });

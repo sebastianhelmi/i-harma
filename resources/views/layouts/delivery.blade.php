@@ -76,27 +76,53 @@
                                 <i class="fas fa-bell"></i>
                                 <span
                                     class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                                    3
+                                    {{ auth()->user()->unreadNotifications->count() }}
                                 </span>
                             </button>
-                            <div class="dropdown-menu dropdown-menu-end notification-menu">
+                            <div class="dropdown-menu dropdown-menu-end notification-menu" style="min-width: 350px; max-width: 400px;">
                                 <h6 class="dropdown-header">Notifikasi</h6>
-                                <div class="notification-item">
-                                    <i class="fas fa-truck text-primary"></i>
-                                    <div class="notification-content">
-                                        <p class="mb-0">Ada pengiriman baru yang perlu diproses</p>
-                                        <small class="text-muted">5 menit yang lalu</small>
-                                    </div>
-                                </div>
-                                <div class="notification-item">
-                                    <i class="fas fa-exclamation-circle text-warning"></i>
-                                    <div class="notification-content">
-                                        <p class="mb-0">Pengiriman #123 mendekati deadline</p>
-                                        <small class="text-muted">1 jam yang lalu</small>
-                                    </div>
-                                </div>
+                                @php
+                                    $deliveryNotifications = auth()->user()->unreadNotifications->whereIn(
+                                        'type',
+                                        [
+                                            \App\Notifications\NewSiteSpbForDeliveryNotification::class,
+                                            \App\Notifications\NewWorkshopOutputForDeliveryNotification::class,
+                                        ]
+                                    );
+                                @endphp
+                                @forelse($deliveryNotifications as $notification)
+                                    @if ($notification->type === \App\Notifications\NewSiteSpbForDeliveryNotification::class)
+                                        <a href="{{ route('notifications.read', [
+                                            'id' => $notification->id,
+                                            'redirect' => route('delivery.plans.show', $notification->data['delivery_plan_id']),
+                                        ]) }}"
+                                            class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                            <div>
+                                                <div><strong>{{ $notification->data['message'] }}</strong></div>
+                                                <div class="small text-muted">
+                                                    <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @elseif ($notification->type === \App\Notifications\NewWorkshopOutputForDeliveryNotification::class)
+                                        <a href="{{ route('notifications.read', [
+                                            'id' => $notification->id,
+                                            'redirect' => route('delivery.plans.create', ['workshop_output_id' => $notification->data['workshop_output_id']]),
+                                        ]) }}"
+                                            class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                            <div>
+                                                <div><strong>{{ $notification->data['message'] }}</strong></div>
+                                                <div class="small text-muted">
+                                                    <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endif
+                                @empty
+                                    <div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>
+                                @endforelse
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item text-center" href="#">Lihat semua notifikasi</a>
+                                <a class="dropdown-item text-center" href="{{ route('delivery.notifications.index') }}">Lihat semua notifikasi</a>
                             </div>
                         </div>
 

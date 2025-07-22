@@ -94,29 +94,47 @@
                             <div class="dropdown-menu dropdown-menu-end" style="min-width: 350px; max-width: 400px;">
                                 <h6 class="dropdown-header">Notifikasi</h6>
                                 @php
-                                    $spbNotifications = auth()
+                                    $pmNotifications = auth()
                                         ->user()
-                                        ->unreadNotifications->where(
+                                        ->unreadNotifications->whereIn(
                                             'type',
-                                            \App\Notifications\NewSpbApprovalNotification::class,
+                                            [
+                                                \App\Notifications\NewSpbApprovalNotification::class,
+                                                \App\Notifications\DuplicateDeliveryPlanDateNotification::class,
+                                            ]
                                         );
                                 @endphp
-                                @forelse($spbNotifications as $notification)
-                                    <a href="{{ route('notifications.read', [
-                                        'id' => $notification->id,
-                                        'redirect' => route('pm.spb-approvals.show', $notification->data['spb_id']),
-                                    ]) }}"
-                                        class="dropdown-item d-flex align-items-start" style="white-space: normal;">
-                                        <div>
-                                            <div><strong>SPB #{{ $notification->data['spb_number'] }}</strong>
-                                                membutuhkan persetujuan</div>
-                                            <div class="small text-muted">
-                                                Proyek: {{ $notification->data['project_name'] }}<br>
-                                                Oleh: {{ $notification->data['created_by'] }}<br>
-                                                <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                @forelse($pmNotifications as $notification)
+                                    @if ($notification->type === \App\Notifications\NewSpbApprovalNotification::class)
+                                        <a href="{{ route('notifications.read', [
+                                            'id' => $notification->id,
+                                            'redirect' => route('pm.spb-approvals.show', $notification->data['spb_id']),
+                                        ]) }}"
+                                            class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                            <div>
+                                                <div><strong>SPB #{{ $notification->data['spb_number'] }}</strong>
+                                                    membutuhkan persetujuan</div>
+                                                <div class="small text-muted">
+                                                    Proyek: {{ $notification->data['project_name'] }}<br>
+                                                    Oleh: {{ $notification->data['created_by'] }}<br>
+                                                    <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </a>
+                                        </a>
+                                    @elseif ($notification->type === \App\Notifications\DuplicateDeliveryPlanDateNotification::class)
+                                        <a href="{{ route('notifications.read', [
+                                            'id' => $notification->id,
+                                            'redirect' => route('delivery.plans.show', $notification->data['new_plan_id']),
+                                        ]) }}"
+                                            class="dropdown-item d-flex align-items-start" style="white-space: normal;">
+                                            <div>
+                                                <div><strong>{{ $notification->data['message'] }}</strong></div>
+                                                <div class="small text-muted">
+                                                    <span>{{ \Carbon\Carbon::parse($notification->created_at)->diffForHumans() }}</span>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    @endif
                                 @empty
                                     <div class="dropdown-item text-muted">Tidak ada notifikasi baru</div>
                                 @endforelse

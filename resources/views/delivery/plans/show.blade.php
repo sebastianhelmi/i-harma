@@ -23,7 +23,7 @@
                                 <i class="fas fa-truck me-1"></i>Mulai Pengiriman
                             </button>
                         </form>
-                    @elseif($plan->status === 'delivering')
+                    @elseif($plan->status === 'shipping')
                         <a href="{{ route('delivery.plans.confirm.form', $plan) }}" class="btn btn-success">
                             <i class="fas fa-check-circle me-1"></i>Konfirmasi Penerimaan Barang
                         </a>

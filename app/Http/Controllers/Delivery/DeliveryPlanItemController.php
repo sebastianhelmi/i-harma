@@ -27,7 +27,7 @@ class DeliveryPlanItemController extends Controller
         $taskId = $request->input('task_id');
 
         // Get inventory items that have SPB history
-        $inventoryItems = Inventory::with(['itemCategory', 'siteSpb'])
+        $inventoryItems = Inventory::with(['itemCategory', 'siteSpbs'])
             ->whereExists(function ($query) use ($projectId, $taskId) {
                 $query->select(DB::raw(1))
                     ->from('site_spbs')
@@ -47,7 +47,7 @@ class DeliveryPlanItemController extends Controller
 
         $workshopOutputs = WorkshopOutput::with(['workshopSpb', 'spb', 'inventory'])
             ->where('status', 'completed')
-            ->whereNull('delivery_plan_id')
+            ->whereRaw('quantity_produced > quantity_delivered')
             ->whereHas('spb', function ($query) use ($projectId, $taskId) {
                 $query->when($projectId, function ($q) use ($projectId) {
                     $q->where('project_id', $projectId);
@@ -68,8 +68,16 @@ class DeliveryPlanItemController extends Controller
                         $q->where('task_id', $taskId);
                     });
             })
-            ->whereNull('delivery_plan_id')
+            ->where(function ($query) use ($plan) {
+                $query->whereNull('delivery_plan_id')
+                      ->orWhere('delivery_plan_id', $plan->id);
+            })
             ->get();
+
+        // Explicitly refresh each item to ensure latest quantity is loaded
+        foreach ($siteSpbItems as $siteSpbItem) {
+            $siteSpbItem->refresh();
+        }
 
         return view('delivery.plans.items.create', compact(
             'plan',
@@ -125,17 +133,22 @@ class DeliveryPlanItemController extends Controller
 
                 case 'workshop_output':
                     $output = WorkshopOutput::findOrFail($validated['source_id']);
-                    if ($output->quantity_produced < $validated['quantity']) {
-                        throw new \Exception('Jumlah melebihi hasil produksi');
+                    $availableQuantity = $output->quantity_produced - $output->quantity_delivered;
+
+                    if ($availableQuantity < $validated['quantity']) {
+                        throw new \Exception('Jumlah melebihi hasil produksi yang tersedia');
                     }
-                    $output->update(['delivery_plan_id' => $plan->id]);
+
+                    $output->increment('quantity_delivered', $validated['quantity']);
                     break;
 
                 case 'site_spb':
                     $siteItem = SiteSpb::findOrFail($validated['source_id']);
                     if ($siteItem->quantity < $validated['quantity']) {
-                        throw new \Exception('Jumlah melebihi permintaan SPB');
+                        throw new \Exception('Jumlah melebihi permintaan SPB yang tersedia (' . $siteItem->quantity . ')');
                     }
+                    $siteItem->decrement('quantity', $validated['quantity']);
+                    $siteItem->refresh(); // Refresh the model to get the latest data from DB
                     $siteItem->update(['delivery_plan_id' => $plan->id]);
                     break;
             }
@@ -174,13 +187,16 @@ class DeliveryPlanItemController extends Controller
                     break;
 
                 case 'workshop_output':
-                    WorkshopOutput::where('id', $item->source_id)
-                        ->update(['delivery_plan_id' => null]);
+                    $output = WorkshopOutput::findOrFail($item->source_id);
+                    $output->decrement('quantity_delivered', $item->quantity);
                     break;
 
                 case 'site_spb':
-                    SiteSpb::where('id', $item->source_id)
-                        ->update(['delivery_plan_id' => null]);
+                    $siteItem = SiteSpb::findOrFail($item->source_id);
+                    $siteItem->increment('quantity', $item->quantity);
+                    if ($siteItem->delivery_plan_id == $plan->id) {
+                        $siteItem->update(['delivery_plan_id' => null]);
+                    }
                     break;
             }
 

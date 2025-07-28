@@ -188,7 +188,7 @@ class TaskController extends Controller
                             'created_by' => Auth::id(),
                             'status' => 'completed',
                             'completed_at' => now(),
-                            'need_delivery' => true, // Asumsi selalu butuh pengiriman jika dibuat dari sini
+                            // 'need_delivery' => true, // Asumsi selalu butuh pengiriman jika dibuat dari sini
                         ]);
 
                         // Notify Delivery role users if need_delivery is true

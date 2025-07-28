@@ -234,10 +234,7 @@
             @method('DELETE')
         </form>
 
-        <form id="delete-item-form" method="POST" style="display: none;">
-            @csrf
-            @method('DELETE')
-        </form>
+        
     @endif
 
     @push('scripts')
@@ -261,24 +258,7 @@
                 });
             }
 
-            function confirmDeleteItem(itemId) {
-                Swal.fire({
-                    title: 'Hapus Item?',
-                    text: "Item akan dihapus dari rencana pengiriman",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Ya, Hapus',
-                    cancelButtonText: 'Tidak'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const form = document.getElementById('delete-item-form');
-                        form.action = `{{ url('delivery/plans/items') }}/${itemId}`;
-                        form.submit();
-                    }
-                });
-            }
+            
         </script>
     @endpush
 

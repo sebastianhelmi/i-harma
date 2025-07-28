@@ -50,8 +50,8 @@ class SpbController extends Controller
 
         // Check which SPBs have items ready to take
         foreach ($spbs as $spb) {
-            $spb->can_take_items = ($spb->status === 'approved' && $spb->po && $spb->po->status === 'completed') ||
-                ($spb->status === 'approved' && $spb->status_po === 'not_required');
+            $spb->can_take_items = (($spb->status === 'approved' && $spb->po && $spb->po->status === 'completed') ||
+                ($spb->status === 'approved' && $spb->status_po === 'not_required')) && $spb->category_entry !== 'site';
         }
 
         return view('head-of-division.spbs.index', compact('spbs', 'projects'));
@@ -206,7 +206,7 @@ class SpbController extends Controller
             'itemCategory',
             'requester',
             'approver',
-            'siteItems',
+            'siteItems.deliveryPlan',
             'workshopItems',
             'po.items', // Load PO items if exists
         ]);
@@ -227,18 +227,25 @@ class SpbController extends Controller
         $inventoryStatus = [];
         if ($spb->category_entry === 'site') {
             foreach ($spb->siteItems as $item) {
-                $status = 'default'; // Corresponds to 'Barang Tidak Tersedia' in the view
+                $status = 'not_assigned'; // Default status if no delivery plan is assigned
 
-                // If SPB is approved and PO is completed (or not required)
-                if ($spb->status === 'approved' && ($spb->status_po === 'not_required' || ($spb->po && $spb->po->status === 'completed'))) {
-                    $status = 'waiting_delivery';
+                if ($item->deliveryPlan) {
+                    if ($item->deliveryPlan->status === 'completed') {
+                        $status = 'completed_delivery';
+                    } elseif ($item->deliveryPlan->status === 'delivering') {
+                        $status = 'delivering';
+                    } else {
+                        $status = 'pending_delivery';
+                    }
                 } else {
-                    // If SPB is not yet approved or PO not completed, check inventory for potential 'insufficient_stock'
-                    $inventory = Inventory::where('item_name', $item->item_name)
-                        ->where('unit', $item->unit)
-                        ->first();
-                    if (!$inventory || $inventory->quantity < $item->quantity) {
-                        $status = 'insufficient_stock';
+                    // If no delivery plan, check for insufficient stock if SPB is approved
+                    if ($spb->status === 'approved') {
+                        $inventory = Inventory::where('item_name', $item->item_name)
+                            ->where('unit', $item->unit)
+                            ->first();
+                        if (!$inventory || $inventory->quantity < $item->quantity) {
+                            $status = 'insufficient_stock';
+                        }
                     }
                 }
                 $inventoryStatus[$item->id] = ['status' => $status];

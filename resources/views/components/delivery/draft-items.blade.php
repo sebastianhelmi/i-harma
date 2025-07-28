@@ -20,7 +20,6 @@
                         <th>Satuan</th>
                         <th>Sumber</th>
                         <th>Status</th>
-                        <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -51,12 +50,6 @@
                             <span class="badge bg-secondary">Regular</span>
                             @endif
                         </td>
-                        <td>
-                            <button type="button" class="btn btn-sm btn-danger"
-                                onclick="confirmDeleteItem({{ $item->id }})">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </td>
                     </tr>
                     @empty
                     <tr>
@@ -71,32 +64,4 @@
     </div>
 </div>
 
-<!-- Hidden Delete Form -->
-<form id="delete-item-form" method="POST" style="display: none;">
-    @csrf
-    @method('DELETE')
-</form>
 @endif
-
-@push('scripts')
-<script>
-    function confirmDeleteItem(itemId) {
-    Swal.fire({
-        title: 'Hapus Item?',
-        text: "Item akan dihapus dari rencana pengiriman",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#dc3545',
-        cancelButtonColor: '#6c757d',
-        confirmButtonText: 'Ya, Hapus',
-        cancelButtonText: 'Tidak'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            const form = document.getElementById('delete-item-form');
-            form.action = `{{ url('delivery/plans/items') }}/${itemId}`;
-            form.submit();
-        }
-    });
-}
-</script>
-@endpush

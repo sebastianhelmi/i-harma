@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\Log;
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -94,10 +96,13 @@ class DeliveryPlan extends Model
     // Authorization Methods
     public function canBeUpdated(): bool
     {
-        return in_array($this->status, [
+        Log::info('DeliveryPlan status: ' . $this->status);
+        $canUpdate = in_array($this->status, [
             self::STATUS_DRAFT,
             self::STATUS_PACKING
         ]);
+        Log::info('canBeUpdated result: ' . ($canUpdate ? 'true' : 'false'));
+        return $canUpdate;
     }
 
     public function canBeCancelled(): bool

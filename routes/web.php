@@ -85,3 +85,5 @@ require __DIR__ . '/purchasing.php';
 require __DIR__ . '/inventory.php';
 require __DIR__ . '/head-of-division.php';
 require __DIR__ . '/delivery.php';
+
+Route::get('/test-db', [App\Http\Controllers\TestController::class, 'test']);

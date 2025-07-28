@@ -68,11 +68,28 @@
                 <div class="card-body">
                     <h6 class="card-subtitle mb-2 text-muted">Status Barang</h6>
                     @if($spb->category_entry === 'site')
-                    @if($spb->status === 'completed')
-                    <span class="badge bg-success fs-6">Sudah Dikirim</span>
-                    @else
-                    <span class="badge bg-info fs-6">Menunggu Pengiriman</span>
-                    @endif
+                        @php
+                            $allDelivered = true;
+                            $anyDelivering = false;
+                            foreach ($spb->siteItems as $item) {
+                                if ($item->deliveryPlan) {
+                                    if ($item->deliveryPlan->status === 'delivering') {
+                                        $anyDelivering = true;
+                                    } elseif ($item->deliveryPlan->status !== 'completed') {
+                                        $allDelivered = false;
+                                    }
+                                } else {
+                                    $allDelivered = false;
+                                }
+                            }
+                        @endphp
+                        @if($allDelivered)
+                            <span class="badge bg-success fs-6">Sudah Dikirim</span>
+                        @elseif($anyDelivering)
+                            <span class="badge bg-warning fs-6">Dalam Pengiriman</span>
+                        @else
+                            <span class="badge bg-info fs-6">Menunggu Pengiriman</span>
+                        @endif
                     @else
                     <span class="badge bg-{{ $spb->status === 'completed' ? 'success' : 'warning' }} fs-6">
                         {{ $spb->status === 'completed' ? 'Sudah Diambil' : 'Belum Diambil' }}
@@ -111,22 +128,40 @@
                                     <td>{{ $item->unit }}</td>
                                     <td>
                                         @switch($inventoryStatus[$item->id]['status'])
-                                        @case('waiting_delivery')
+                                        @case('completed_delivery')
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-check-circle me-1"></i>
+                                            Sudah Dikirim
+                                        </span>
+                                        @break
+                                        @case('delivering')
+                                        <span class="badge bg-warning">
+                                            <i class="fas fa-truck me-1"></i>
+                                            Dalam Pengiriman
+                                        </span>
+                                        @break
+                                        @case('pending_delivery')
                                         <span class="badge bg-info">
                                             <i class="fas fa-clock me-1"></i>
-                                            Menunggu Rencana Pengiriman
+                                            Menunggu Pengiriman
                                         </span>
                                         @break
                                         @case('insufficient_stock')
-                                        <span class="badge bg-warning">
+                                        <span class="badge bg-danger">
                                             <i class="fas fa-exclamation-triangle me-1"></i>
                                             Stok Tidak Mencukupi
                                         </span>
                                         @break
-                                        @default
+                                        @case('not_assigned')
                                         <span class="badge bg-secondary">
                                             <i class="fas fa-times me-1"></i>
-                                            Barang Tidak Tersedia
+                                            Belum Dialokasikan
+                                        </span>
+                                        @break
+                                        @default
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-question-circle me-1"></i>
+                                            Status Tidak Diketahui
                                         </span>
                                         @endswitch
                                     </td>

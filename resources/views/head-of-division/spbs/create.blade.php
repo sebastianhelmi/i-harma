@@ -145,12 +145,13 @@
 
                     <!-- Items Card -->
                     <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <h5 class="card-title mb-0">Daftar Item</h5>
-                            <button type="button" class="btn btn-sm btn-primary" x-on:click="addItem()">
-                                <i class="fas fa-plus me-2"></i>Tambah Item
-                            </button>
-                        </div>
+                       <div class="card-header d-flex justify-content-between align-items-center">
+    <h5 class="card-title mb-0">Daftar Item</h5>
+    <button type="button" class="btn btn-sm btn-primary"
+            x-on:click="category === 'site' ? addItem() : addWorkshopItem()">
+        <i class="fas fa-plus me-2"></i>Tambah Item
+    </button>
+</div>
                         <div class="card-body">
                             <!-- Site Items Form -->
                             <template x-if="category === 'site'">
